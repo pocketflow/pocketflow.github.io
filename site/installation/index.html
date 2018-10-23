@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Installation - PocketFlow Docs</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Installation";
+    var mkdocs_page_input_path = "installation.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> PocketFlow Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Installation</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#installation">Installation</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#clone-pocketflow">Clone PocketFlow</a></li>
+        
+            <li><a class="toctree-l3" href="#prepare-for-the-local-mode">Prepare for the Local Mode</a></li>
+        
+            <li><a class="toctree-l3" href="#prepare-for-the-docker-mode">Prepare for the Docker Mode</a></li>
+        
+            <li><a class="toctree-l3" href="#prepare-for-the-seven-mode">Prepare for the Seven Mode</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../quick_start/">Quick Start</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../self_defined_models/">Self-defined Models</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Learners</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../cp_learner/">Channel Pruning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../dcp_learner/">Discrimination-aware Channel Pruning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../ws_learner/">Weight Sparsification</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../uq_learner/">Uniform Quantization</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../nuq_learner/">Non-uniform Quantization</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../distillation/">Distillation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../multi_gpu/">Multi-GPU Training</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Hyper-parameter Optimizers</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../reinforcement_learning/">Reinforcement Learning</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../performance/">Performance</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../faq/">Frequently Asked Questions</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Appendix</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../pre_trained_models/">Pre-trained Models</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../test_cases/">Test Cases</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">PocketFlow Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Installation</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="installation">Installation</h1>
+<p>PocketFlow is developed and tested on Linux, using Python 3.x and TensorFlow 1.10.0. We support the following three execution modes for PocketFlow:</p>
+<ul>
+<li>Local mode: run PocketFlow on the local machine.</li>
+<li>Docker mode: run PocketFlow within a docker image.</li>
+<li>Seven mode: run PocketFlow on the seven cluster.</li>
+</ul>
+<p>We recommend to use Anaconda as the Python environment, and then install TensorFlow with pip. Alternatively, you may download our pre-built docker image, which integrates TensorFlow and <a href="https://github.com/uber/horovod">Horovod</a>, an open-source distributed training framework if multi-GPU training is favored.</p>
+<h2 id="clone-pocketflow">Clone PocketFlow</h2>
+<p>To make a local copy of the PocketFlow repository, use:</p>
+<pre><code class="bash">$ git clone http://git.code.oa.com/ml/PocketFlow.git
+</code></pre>
+
+<h2 id="prepare-for-the-local-mode">Prepare for the Local Mode</h2>
+<p>We recommend to use Anaconda as the Python environment, which has many essential packages built-in. The Anaconda installer can be downloaded from <a href="https://www.anaconda.com/download/#linux">here</a>. To install, use the following command:</p>
+<pre><code class="bash"># install Anaconda; replace the installer's file name if needed
+$ bash Anaconda3-5.2.0-Linux-x86_64.sh
+
+# activate Anaconda's Python path
+$ source ~/.bashrc
+</code></pre>
+
+<p>For Anaconda 5.3.0 or later, the default Python version is 3.7, which does not support installing TensorFlow with pip directly. Therefore, you need to manually switch to Python 3.6 once Anaconda is installed:</p>
+<pre><code class="bash"># install Python 3.6
+$ conda install python=3.6
+</code></pre>
+
+<p>To install TensorFlow, you may refer to TensorFlow's official <a href="https://www.tensorflow.org/install/pip">documentation</a> for detailed instructions. Specially, if GPU-based training is required, then you need to follow the <a href="https://www.tensorflow.org/install/gpu">GPU support guide</a> to set up a CUDA-enabled GPU card in prior to installation. After that, install TensorFlow with:</p>
+<pre><code class="bash"># TensorFlow with GPU support; use &lt;tensorflow&gt; if GPU is not available
+$ pip install tensorflow-gpu
+
+# verify the install
+$ python -c &quot;import tensorflow as tf; print(tf.__version__)&quot;
+</code></pre>
+
+<p>To run PocketFlow in the local mode, <em>e.g.</em> to train a full-precision ResNet-20 model for the CIFAR-10 classification task, use the following command:</p>
+<pre><code class="bash"># DATA_DIR_LOCAL: directory path to the CIFAR-10 data set on the local machine
+# HDFS_URL: IP address of HDFS namenode, prefixed with protocol, followed by WebHDFS port
+$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+    --learner full-prec \
+    --data_disk local \
+    --data_dir_local ${DATA_DIR_LOCAL} \
+    --hdfs_url ${HDFS_URL}
+</code></pre>
+
+<h2 id="prepare-for-the-docker-mode">Prepare for the Docker Mode</h2>
+<p>Docker offers an alternative way to run PocketFlow within an isolated container, so that your local Python environment remains untouched. We recommend you to use the <a href="https://github.com/uber/horovod">horovod</a> docker provided by Uber, which enables multi-GPU distributed training for TensorFlow with only a few lines modification. Once docker is installed, the docker image can be obtained via:</p>
+<pre><code class="bash"># obtain the docker image
+$ docker pull uber/horovod
+</code></pre>
+
+<p>To run PocketFlow in the docker mode, <em>e.g.</em> to train a full-precision ResNet-20 model for the CIFAR-10 classification task, use the following command:</p>
+<pre><code class="bash"># DATA_DIR_LOCAL: directory path to the CIFAR-10 data set on the local machine
+# HDFS_URL: IP address of HDFS namenode, prefixed with protocol, followed by WebHDFS port
+$ ./scripts/run_docker.sh nets/resnet_at_cifar10_run.py ${DATA_DIR_LOCAL} \
+    --learner full-prec \
+    --data_disk local \
+    --data_dir_local /opt/ml/data \
+    --hdfs_url ${HDFS_URL}
+</code></pre>
+
+<h2 id="prepare-for-the-seven-mode">Prepare for the Seven Mode</h2>
+<p>Seven is a distributed learning platform built for both CPU and GPU clusters. Users can submit tasks to the seven cluster, using built-in data sets and docker images seamlessly. For detailed introduction, please refer to its <a href="http://git.code.oa.com/ml/seven-doc/blob/master/seven/seven-client.md">documentation site</a>.</p>
+<p>To run PocketFlow in the seven mode, <em>e.g.</em> to train a full-precision ResNet-20 model for the CIFAR-10 classification task, use the following command:</p>
+<pre><code class="bash"># DATA_DIR_SEVEN: directory path to the CIFAR-10 data set on the seven cluster
+# HDFS_URL: IP address of HDFS namenode, prefixed with protocol, followed by WebHDFS port
+$ ./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
+    --learner full-prec \
+    --data_disk seven \
+    --data_dir_seven ${DATA_DIR_SEVEN} \
+    --hdfs_url ${HDFS_URL}
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../quick_start/" class="btn btn-neutral float-right" title="Quick Start">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../quick_start/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../mathjax-config.js" defer></script>
+      <script src="../MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

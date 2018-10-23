@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Uniform Quantization - PocketFlow Docs</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Uniform Quantization";
+    var mkdocs_page_input_path = "uq_learner.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> PocketFlow Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../installation/">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../quick_start/">Quick Start</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../self_defined_models/">Self-defined Models</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Learners</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../cp_learner/">Channel Pruning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../dcp_learner/">Discrimination-aware Channel Pruning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../ws_learner/">Weight Sparsification</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Uniform Quantization</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#uniform-quantization">Uniform Quantization</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#uniform-quantization-learner">Uniform Quantization Learner</a></li>
+        
+            <li><a class="toctree-l4" href="#tensorflow-quantization-wrapper">TensorFlow Quantization Wrapper</a></li>
+        
+            <li><a class="toctree-l4" href="#algorithms">Algorithms</a></li>
+        
+            <li><a class="toctree-l4" href="#references">References</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../nuq_learner/">Non-uniform Quantization</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../distillation/">Distillation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../multi_gpu/">Multi-GPU Training</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Hyper-parameter Optimizers</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../reinforcement_learning/">Reinforcement Learning</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../performance/">Performance</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../faq/">Frequently Asked Questions</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Appendix</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../pre_trained_models/">Pre-trained Models</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../test_cases/">Test Cases</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">PocketFlow Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Learners &raquo;</li>
+        
+      
+    
+    <li>Uniform Quantization</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="uniform-quantization">Uniform Quantization</h1>
+<p>This document describes how to set up uniform quantization with PocketFlow. Uniform quantization is widely used for model compression and acceleration. Originally the weights in the network are represented by 32-bit float numbers. With uniform quantization, low-precision  (e.g., 4 bit, 8 bit) and evenly distributed float numbers are used to approximate the full precision networks. For 8 bit quantization, the network size can be reduced by 4 folds with little drop of performance.</p>
+<p>Currently PocketFlow supports two types of uniform quantization:</p>
+<ul>
+<li>
+<p>Uniform Quantization Learner: the self-developed learner. Aside from uniform quantization, the learner is carefully optimized with various extensions supported. The detailed algorithm of the Uniform Quantized Learner will be introduced at the end of the algorithm. The algorithm details are presented at the end of the document.</p>
+</li>
+<li>
+<p>TensorFlow Quantization Wrapper:  a wrapper based on the <a href="https://www.tensorflow.org/performance/post_training_quantization">post training quantization</a> in TensorFlow. The wrapper currently only supports 8-bit quantization, enjoying 4x reduction of memory and nearly 4x times speed up of inference.</p>
+</li>
+</ul>
+<p>A comparison of the two learners are shown below:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Features</th>
+<th align="center">Uniform Quantization Learner</th>
+<th align="center">TensorFlow Quantization Wrapper</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Compression</td>
+<td align="center">yes</td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="center">Acceleration</td>
+<td align="center"></td>
+<td align="center">Yes</td>
+</tr>
+<tr>
+<td align="center">Fine-tuning</td>
+<td align="center">Yes</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">Bucketing</td>
+<td align="center">Yes</td>
+<td align="center"></td>
+</tr>
+<tr>
+<td align="center">Hyper-param Searching</td>
+<td align="center">Yes</td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="uniform-quantization-learner">Uniform Quantization Learner</h2>
+<p>The uniform quantization learner supports both weight quantization and activation quantization, where users can manually set up the bits for quantization. The uniform quantization learner also supports bucketing, which leads to more fine-grained quantization and better performance. The users can also turn on the hyper parameter optimizer with reinforcement learning to search for the optimal bit allocation for the learner.</p>
+<h3 id="prepare-the-model">Prepare the Model</h3>
+<p>To quantize the network, users should first get the model prepared. Users can either use the pre-built models in PocketFlow, or develop their custom models according to <a href="???">TODO</a>.</p>
+<h3 id="configure-the-learner">Configure the Learner</h3>
+<p>To configure the learner, users can pass the options via the TensorFlow flag interface. The available options are as follows:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Options</th>
+<th align="center">Default Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>--uql_weight_bits</code></td>
+<td align="center">4</td>
+<td align="left">the number of bits for weight</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_activation_bits</code></td>
+<td align="center">32</td>
+<td align="left">the number of bits for activation， by default it remains full precision</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_save_quant_mode_path</code></td>
+<td align="center"><em>TODO</em></td>
+<td align="left">the save path for quantized models</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_use_buckets</code></td>
+<td align="center">False</td>
+<td align="left">use bucketing or not</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_bucket_type</code></td>
+<td align="center">channel</td>
+<td align="left">two bucket type available: ['split', 'channel']</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_bucket_size</code></td>
+<td align="center">256</td>
+<td align="left">quantize the first and last layers of the network or not</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_enbl_rl_agent</code></td>
+<td align="center">False</td>
+<td align="left">enable reinforcement learning  to learn the optimal bit allocation or not</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_quantize_all_layers</code></td>
+<td align="center">False</td>
+<td align="left">quantize the first and last layers of the network or not</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_quant_epoch</code></td>
+<td align="center">60</td>
+<td align="left">the number of epochs for fine-tuning</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples">Examples</h3>
+<p>Once the model is built, the quantization can be easily triggered by directly passing the Uniform Quantization Learner in the command line as follows:</p>
+<pre><code class="bash"># quantize resnet-20 on CIFAR-10
+# you can also configure the
+sh ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+--data_disk local \
+--data_dir_local ${PF_CIFAR10_LOCAL} \
+--learner=uniform \
+--uql_weight_bits=4 \
+--uql_activation_bits=4 \
+
+# quantize the resnet-18 on ILSVRC-12
+sh ./scripts/run_local.sh nets/resnet_at_ilsvrc12_run.py \
+--learner=uniform \
+--data_disk local \
+--data_dir_local ${PF_ILSVRC12_LOCAL} \
+--uql_weight_bits=8 \
+--uql_activation_bits=8 \
+--uql_use_buckets=True \
+--uql_bucket_type=channel
+</code></pre>
+
+<h3 id="configure-the-hyper-parameter-optimizer">Configure the Hyper Parameter Optimizer</h3>
+<p>Once the hyper parameter optimizer is turned on, i.e., <code>uql_enbl_rl_agent==True</code> , the reinforcement learning agents will search for the optimal allocation of bits to each layers.  Before the search, users are supposed set up the bit constraints via <code>--uql_evquivalent_bits</code>, so that the optimal bits searched by the RL agent will not exceed the bit number without RL agent.
+<em>For example, TODO</em></p>
+<p>Users can also configure other options in the RL agent, such as the number of roll-outs, the fine-tuning steps to get the reward, e.t.c.. Full list of options are listed as follows:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Options</th>
+<th align="center">Default Value</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>--uql_evquivalent_bits</code></td>
+<td align="center">4</td>
+<td align="left">the number of re-allocated bits that is equivalent to uniform quantization without RL agent</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_nb_rlouts</code></td>
+<td align="center">200</td>
+<td align="left">the number of roll outs for training the RL agent</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_w_bit_min</code></td>
+<td align="center">2</td>
+<td align="left">the minimal number of bits for each layer</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_w_bit_max</code></td>
+<td align="center">8</td>
+<td align="left">the maximal number of bits for each layer</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_enbl_rl_global_tune</code></td>
+<td align="center">True</td>
+<td align="left">enable fine-tuning all layers of the network or not</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_enbl_rl_layerwise_tune</code></td>
+<td align="center">False</td>
+<td align="left">enable fine-tuning the network layer by layer or not</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_tune_layerwise_steps</code></td>
+<td align="center">100</td>
+<td align="left">the number of steps for layerwise fine-tuning</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_tune_global_steps</code></td>
+<td align="center">2000</td>
+<td align="left">the number of steps for global fine-tuning</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_tune_disp_steps</code></td>
+<td align="center">300</td>
+<td align="left">the display steps to show the fine-tuning progress</td>
+</tr>
+<tr>
+<td align="left"><code>--uql_enbl_random_layers</code></td>
+<td align="center">True</td>
+<td align="left">randomly permute the layers during RL agent training</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples_1">Examples</h3>
+<pre><code class="bash"># quantize mobilenet-v1 on ILSVRC-12
+sh ./scripts/run_local.sh nets/mobilnet_at_ilsvrc12_run.py \
+--data_disk local \
+--data_dir_local ${PF_CIFAR10_LOCAL} \
+--learner=uniform \
+--uql_enbl_rl_agent=True \
+--uql_equivalent_bits=4 \
+--uql_tune_global_steps=1200
+</code></pre>
+
+<h3 id="performance">Performance</h3>
+<p>Here we list some of the performance on Cifar-10 using the Uniform Quantization Learner and the built-in models in PocketFlow. The options not displayed remain the default values.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Model</th>
+<th align="center">Weight Bit</th>
+<th align="center">Activation Bit</th>
+<th align="center">Acc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">ResNet-20</td>
+<td align="center">32</td>
+<td align="center">32</td>
+<td align="center">91.96</td>
+</tr>
+<tr>
+<td align="center">ResNet-20</td>
+<td align="center">4</td>
+<td align="center">4</td>
+<td align="center">90.73</td>
+</tr>
+<tr>
+<td align="center">ResNet-20</td>
+<td align="center">8</td>
+<td align="center">8</td>
+<td align="center">92.25</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">Model</th>
+<th align="center">Weight Bit</th>
+<th align="center">Bucketing</th>
+<th align="center">Acc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">ResNet-20</td>
+<td align="center">2</td>
+<td align="center">channel</td>
+<td align="center">89.67</td>
+</tr>
+<tr>
+<td align="center">ResNet-20</td>
+<td align="center">4</td>
+<td align="center">channel</td>
+<td align="center">92.02</td>
+</tr>
+<tr>
+<td align="center">ResNet-20</td>
+<td align="center">2</td>
+<td align="center">split</td>
+<td align="center">91.15</td>
+</tr>
+<tr>
+<td align="center">ResNet-20</td>
+<td align="center">4</td>
+<td align="center">split</td>
+<td align="center">91.98</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">Model</th>
+<th align="center">Weight Bit</th>
+<th align="center">RL search</th>
+<th align="center">Acc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">ResNet-20</td>
+<td align="center">2</td>
+<td align="center">FALSE</td>
+<td align="center">86.17</td>
+</tr>
+<tr>
+<td align="center">ResNet-20</td>
+<td align="center">4</td>
+<td align="center">FALSE</td>
+<td align="center">91.76</td>
+</tr>
+<tr>
+<td align="center">ResNet-20</td>
+<td align="center">2</td>
+<td align="center">TRUE</td>
+<td align="center">90.30</td>
+</tr>
+<tr>
+<td align="center">ResNet-20</td>
+<td align="center">4</td>
+<td align="center">TRUE</td>
+<td align="center">91.88</td>
+</tr>
+</tbody>
+</table>
+<h2 id="tensorflow-quantization-wrapper">TensorFlow Quantization Wrapper</h2>
+<p>PocketFlow wraps the post training quantization in Tensorflow, and include all the necessary steps to convert the model to the .tflite format, which can be deployed on Andriod devices. To run the wrapper, users only need to get the checkpoint files ready, and then run the script.</p>
+<h3 id="prepare-the-checkpoint-files">Prepare the Checkpoint Files</h3>
+<p>Generally in TensorFlow, the checkpoints of a model include three files: .data, .index, .meta. Users are also supposed to add the input and output to collections,  and configure the wrapper to acquire the corresponding collections. An example is as follows:</p>
+<p><em>TODO</em> add quantization to the conversion tools</p>
+<pre><code class="bash"># load the checkpoints in ./models, and read the collections of 'inputs' and 'outputs'
+python export_pb_tflite_models.py \
+--model_dir ./models
+--input_coll inputs
+--output_coll outputs
+--quantize True
+</code></pre>
+
+<p>If successfully transformed, the <code>.pb</code> and <code>.tflite</code> files will be saved in <code>./models</code>.</p>
+<h3 id="deploy-on-mobile-devices">Deploy on Mobile Devices</h3>
+<p><em>TODO</em></p>
+<h2 id="algorithms">Algorithms</h2>
+<p>Now we introduce the detailed algorithm in the Uniform Quantization Learner. As is shown in the following graph, given a full precision model, the Uniform Quantization Learner inserts quantization nodes into the computation graph of the model. To enable activation quantization, the quantization nodes shall also be inserted after the activation function.
+In the training phase, both full-precision and quantized weights are stored. During the forward pass, quantized weights are obtained by applying the quantization functions on the full precision weights. For the backward propagation of gradients, since the gradients w.r.t. the quantized weights are 0 almost everywhere, we use the straight-through estimator (STE) (<a href="https://www.coursera.org/learn/neural-networks">Hinton et.al 2012</a>, <a href="https://arxiv.org/abs/1308.3432">Bengio et.al 2013</a>) to pass the gradient of quantized weights directly to the full precision weights for update.</p>
+<p><img alt="Alt text" src="../train_inference.png" /></p>
+<h3 id="uniform-quantization-function">Uniform Quantization Function</h3>
+<p>Uniform quantization distributed the quantization points evenly across the distribution of weights, and the full precision numbers are then assigned to the closest quantization point. To achieve this, we first normalize the full precision weights <span><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span> of one layer to  <span><span class="MathJax_Preview">[0, 1]</span><script type="math/tex">[0, 1]</script></span>, i.e.,
+$$
+sc(x) = \frac{x-\beta}{\alpha},
+$$
+where <span><span class="MathJax_Preview">\alpha=\max{x}-\min{x}</span><script type="math/tex">\alpha=\max{x}-\min{x}</script></span> and  <span><span class="MathJax_Preview">\beta = \min{x}</span><script type="math/tex">\beta = \min{x}</script></span> are the scaling factors. Then we assign <span><span class="MathJax_Preview">sc(x)</span><script type="math/tex">sc(x)</script></span> to the discrete value by
+$$
+\hat{x}=\frac{1}{2^k-1}\mathrm{round}((2^k-1)\cdot sc(x)),
+$$
+and finally we do the inverse linear transformation to recover the quantized weights to the original scale,
+$$
+Q(x)=\alpha\hat{x}+\beta.
+$$</p>
+<h2 id="references">References</h2>
+<p>Bengio Y, Léonard N, Courville A. Estimating or propagating gradients through stochastic neurons for conditional computation. arXiv preprint <a href="https://arxiv.org/abs/1308.3432">arXiv:1308.3432, 2013</a></p>
+<p>Geoffrey Hinton, Nitish Srivastava, Kevin Swersky, Tijmen Tieleman and Abdelrahman Mohamed. Neural Networks for Machine Learning. <a href="https://www.coursera.org/learn/neural-networks">Coursera, video lectures, 2012</a></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../nuq_learner/" class="btn btn-neutral float-right" title="Non-uniform Quantization">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../ws_learner/" class="btn btn-neutral" title="Weight Sparsification"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../ws_learner/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../nuq_learner/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../mathjax-config.js" defer></script>
+      <script src="../MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>
