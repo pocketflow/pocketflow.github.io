@@ -60,17 +60,12 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../quick_start/">Quick Start</a>
+    <a class="" href="../tutorial/">Tutorial</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <a class="" href="../self_defined_models/">Self-defined Models</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Learners</span>
+    <span class="caption-text">Learners - Algorithms</span>
     <ul class="subnav">
                 <li class="">
                     
@@ -97,12 +92,17 @@
           
             <li class="toctree-l1">
 		
+    <span class="caption-text">Learners - Misc.</span>
+    <ul class="subnav">
+                <li class="">
+                    
     <a class="" href="../distillation/">Distillation</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../multi_gpu/">Multi-GPU Training</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../multi_gpu_training/">Multi-GPU Training</a>
+                </li>
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -112,6 +112,10 @@
                 <li class="">
                     
     <a class="" href="../reinforcement_learning/">Reinforcement Learning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../automl_based_methods/">AutoML-based Methods</a>
                 </li>
     </ul>
 	    </li>
@@ -160,6 +164,10 @@
 
     </ul>
                 </li>
+                <li class="">
+                    
+    <a class="" href="../reference/">Reference</a>
+                </li>
     </ul>
 	    </li>
           
@@ -202,173 +210,151 @@
                 <h1 id="test-cases">Test Cases</h1>
 <p>This document contains various test cases to cover different combinations of learners and hyper-parameter settings. Any merge request to the master branch should be able to pass all the test cases to be approved.</p>
 <h2 id="fp-full-precision">FP: Full-Precision</h2>
-<pre><code class="bash"># local machine + local data
-./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
-    --learner full-prec \
-    --data_disk local \
-    --data_dir_local ${PF_CIFAR10_LOCAL} \
-    --hdfs_url ${PF_HDFS_URL}
-
-# local machine + HDFS data
-./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
-    --learner full-prec \
+<pre><code class="bash"># local mode
+$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py
+$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+    --enbl_dst
+$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+    --data_disk hdfs
+$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
     --data_disk hdfs \
-    --hdfs_host ${PF_HDFS_HOST} \
-    --hdfs_url ${PF_HDFS_URL}
+    --enbl_dst
 
-# SEVEN cluster + SEVEN-disk data
-./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py \
-    --learner full-prec \
-    --data_disk seven \
-    --hdfs_url ${PF_HDFS_URL}
-
-# SEVEN cluster + HDFS data
-./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py \
-    --learner full-prec \
+# seven mode
+$ ./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py
+$ ./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py \
+    --enbl_dst
+$ ./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py \
+    --data_disk hdfs
+$ ./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py \
     --data_disk hdfs \
-    --hdfs_host ${PF_HDFS_HOST} \
-    --hdfs_url ${PF_HDFS_URL}
+    --enbl_dst
+
+# docker mode
+$ ./scripts/run_docker.sh nets/lenet_at_cifar10_run.py
+$ ./scripts/run_docker.sh nets/lenet_at_cifar10_run.py \
+    --enbl_dst
+$ ./scripts/run_docker.sh nets/resnet_at_cifar10_run.py
+$ ./scripts/run_docker.sh nets/resnet_at_cifar10_run.py \
+    --enbl_dst
 </code></pre>
 
 <h2 id="cp-channel-pruning">CP: Channel Pruning</h2>
 <pre><code class="bash"># uniform preserve ratios for all layers
-./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
+$ ./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
     --learner channel \
-    --prune_option uniform \
-    --uniform_preserve_ratio 0.5 \
-    --hdfs_url ${PF_HDFS_URL}
+    --cp_prune_option uniform \
+    --cp_uniform_preserve_ratio 0.5
 
 # auto-tuned preserve ratios for each layer
-./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
-    --learner channel \
-    --prune_option auto \
-    --preserve_ratio 0.3 \
-    --hdfs_url ${PF_HDFS_URL}
+$ ./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
+    --cp_learner channel \
+    --cp_prune_option auto \
+    --cp_preserve_ratio 0.3
 </code></pre>
 
 <h2 id="dcp-discrimination-aware-channel-pruning">DCP: Discrimination-aware Channel Pruning</h2>
-<pre><code class="bash"># network distillation
-./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+<pre><code class="bash"># no network distillation
+$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
     --learner dis-chn-pruned \
     --dcp_nb_stages 3 \
-    --data_disk hdfs \
-    --hdfs_host ${PF_HDFS_HOST} \
-    --hdfs_url ${PF_HDFS_URL}
+    --data_disk hdfs
 
-# no network distillation
-./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py \
+# network distillation
+$ ./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py \
     --learner dis-chn-pruned \
-    --noenbl_dst \
-    --dcp_nb_stages 4 \
-    --hdfs_url ${PF_HDFS_URL}
+    --enbl_dst \
+    --dcp_nb_stages 4
 </code></pre>
 
 <h2 id="ws-weight-sparsification">WS: Weight Sparsification</h2>
 <pre><code class="bash"># uniform pruning ratios for all layers
-./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
     --learner weight-sparse \
     --ws_prune_ratio_prtl uniform \
-    --data_disk hdfs \
-    --hdfs_host ${PF_HDFS_HOST} \
-    --hdfs_url ${PF_HDFS_URL}
+    --data_disk hdfs
 
 # optimal pruning ratios for each layer
-./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
     --learner weight-sparse \
     --ws_prune_ratio_prtl optimal \
-    --data_disk hdfs \
-    --hdfs_host ${PF_HDFS_HOST} \
-    --hdfs_url ${PF_HDFS_URL}
+    --data_disk hdfs
 
 # heurist pruning ratios for each layer
-./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py \
+$ ./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py \
     --learner weight-sparse \
-    --ws_prune_ratio_prtl heurist \
-    --hdfs_url ${PF_HDFS_URL}
+    --ws_prune_ratio_prtl heurist
 
 # optimal pruning ratios for each layer
-./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py \
+$ ./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py \
     --learner weight-sparse \
-    --ws_prune_ratio_prtl optimal \
-    --hdfs_url ${PF_HDFS_URL}
+    --ws_prune_ratio_prtl optimal
 </code></pre>
 
 <h2 id="uq-uniform-quantization">UQ: Uniform Quantization</h2>
 <pre><code class="bash"># channel-based bucketing
-./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
     --learner uniform \
     --uql_use_buckets \
     --uql_bucket_type channel \
-    --data_disk hdfs \
-    --hdfs_host ${PF_HDFS_HOST} \
-    --hdfs_url ${PF_HDFS_URL}
+    --data_disk hdfs
 
 # split-based bucketing
-./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
     --learner uniform \
     --uql_use_buckets \
     --uql_bucket_type split \
-    --data_disk hdfs \
-    --hdfs_host ${PF_HDFS_HOST} \
-    --hdfs_url ${PF_HDFS_URL}
+    --data_disk hdfs
 
 # channel-based bucketing + RL
-./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py -n=2 \
+$ ./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py -n=2 \
     --learner uniform \
     --uql_enbl_rl_agent \
     --uql_use_buckets \
-    --uql_bucket_type channel \
-    --hdfs_url ${PF_HDFS_URL}
+    --uql_bucket_type channel
 
 # split-based bucketing + RL
-./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py -n=2 \
+$ ./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py -n=2 \
     --learner uniform \
     --uql_enbl_rl_agent \
     --uql_use_buckets \
-    --uql_bucket_type split \
-    --hdfs_url ${PF_HDFS_URL}
+    --uql_bucket_type split
 </code></pre>
 
 <h2 id="nuq-non-uniform-quantization">NUQ: Non-uniform Quantization</h2>
 <pre><code class="bash"># channel-based bucketing + RL + optimize clusters
-./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
     --learner non-uniform \
     --nuql_enbl_rl_agent \
     --nuql_use_buckets \
     --nuql_bucket_type channel \
     --nuql_opt_mode clusters \
-    --data_disk hdfs \
-    --hdfs_host ${PF_HDFS_HOST} \
-    --hdfs_url ${PF_HDFS_URL}
+    --data_disk hdfs
 
 # split-based bucketing + RL + optimize weights
-./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
     --learner non-uniform \
     --nuql_enbl_rl_agent \
     --nuql_use_buckets \
     --nuql_bucket_type split \
     --nuql_opt_mode weights \
-    --data_disk hdfs \
-    --hdfs_host ${PF_HDFS_HOST} \
-    --hdfs_url ${PF_HDFS_URL}
+    --data_disk hdfs
 
 # channel-based bucketing + RL + optimize weights
-./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py -n=2 \
+$ ./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py -n=2 \
     --learner non-uniform \
     --nuql_enbl_rl_agent \
     --nuql_use_buckets \
     --nuql_bucket_type channel \
-    --nuql_opt_mode weights \
-    --hdfs_url ${PF_HDFS_URL}
+    --nuql_opt_mode weights
 
 # split-based bucketing + RL + optimize clusters
-./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py -n=2 \
+$ ./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py -n=2 \
     --learner non-uniform \
     --nuql_enbl_rl_agent \
     --nuql_use_buckets \
     --nuql_bucket_type split \
-    --nuql_opt_mode clusters \
-    --hdfs_url ${PF_HDFS_URL}
+    --nuql_opt_mode clusters
 </code></pre>
               
             </div>
@@ -376,6 +362,8 @@
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../reference/" class="btn btn-neutral float-right" title="Reference">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../pre_trained_models/" class="btn btn-neutral" title="Pre-trained Models"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -406,6 +394,8 @@
       
         <span><a href="../pre_trained_models/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
+      
+        <span style="margin-left: 15px"><a href="../reference/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

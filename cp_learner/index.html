@@ -60,17 +60,12 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../quick_start/">Quick Start</a>
+    <a class="" href="../tutorial/">Tutorial</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <a class="" href="../self_defined_models/">Self-defined Models</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Learners</span>
+    <span class="caption-text">Learners - Algorithms</span>
     <ul class="subnav">
                 <li class=" current">
                     
@@ -117,12 +112,17 @@
           
             <li class="toctree-l1">
 		
+    <span class="caption-text">Learners - Misc.</span>
+    <ul class="subnav">
+                <li class="">
+                    
     <a class="" href="../distillation/">Distillation</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../multi_gpu/">Multi-GPU Training</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../multi_gpu_training/">Multi-GPU Training</a>
+                </li>
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -132,6 +132,10 @@
                 <li class="">
                     
     <a class="" href="../reinforcement_learning/">Reinforcement Learning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../automl_based_methods/">AutoML-based Methods</a>
                 </li>
     </ul>
 	    </li>
@@ -158,6 +162,10 @@
                     
     <a class="" href="../test_cases/">Test Cases</a>
                 </li>
+                <li class="">
+                    
+    <a class="" href="../reference/">Reference</a>
+                </li>
     </ul>
 	    </li>
           
@@ -183,7 +191,7 @@
     
       
         
-          <li>Learners &raquo;</li>
+          <li>Learners - Algorithms &raquo;</li>
         
       
     
@@ -204,7 +212,7 @@
 <h2 id="pruning-option">Pruning Option</h2>
 <p>The code of channel pruning are located at directory <code>./learners/channel_pruning</code>. To use channel pruning. users can set <code>--learners</code> to <code>channel</code>. The Channel pruning supports 3 kinds of pruning setup by <code>prune_option</code> option. </p>
 <h3 id="uniform-channel-pruning">Uniform Channel Pruning</h3>
-<p>One is the uniform layer pruning, which means the user can set each layer has a uniform pruning ratio by  <code>--prune_option=uniform</code> and set the ratio (eg. making the ratio 0.5) by <code>--uniform_preserve_ratio=0.5</code>.  </p>
+<p>One is the uniform layer pruning, which means the user can set each convolution layer pruned with an uniform pruning ratio by  <code>--prune_option=uniform</code> and set the ratio (eg. making the ratio 0.5) by <code>--uniform_preserve_ratio=0.5</code>. Note that for a layer, if both of pruning ratio of the layer and its previous layer are 0.5, the real preserved FLOPs are 1/4 of original FLOPs. Because channel pruning only prune the c_out channels of the convolution and c_in channels of the next convolution, if both c_in and c_out channels are pruned by 0.5, it will preserve only 1/4 of original computation cost. For a layer by layer convolution networks without residual blocks, if the user set <code>uniform_preserve_ratio</code> to <code>0.5</code>, the whole model will be the 0.25 computation of the original model. However for the residual networks, some convolutions can only prune their c_in or c_out channels, which means the total preseved computation ratio may be much greater than 0.25.</p>
 <p><strong>Example:</strong></p>
 <pre><code>./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
     --uniform_preserve_ratio=0.5 \
@@ -219,9 +227,10 @@
 <p><strong>Example:</strong>
 Add list <code>1.0, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 1.0, 0.25, 1.0, 0.25, 0.21875, 0.21875, 0.21875, 1.0, 0.5625, 1.0, 0.546875, 0.546875, 0.546875, 1</code> in <code>./ratio.list</code></p>
 <pre><code>./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
-    --learner=channel\
+    --learner=channel \
     --prune_option=list \
     --batch_size_eval=64 \
+    --prune_list_file=./ratio.list \
     --resnet_size=20 
 </code></pre>
 
@@ -241,7 +250,7 @@ Add list <code>1.0, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 1.0,
 <h2 id="distilling">Distilling</h2>
 <p>Distilling is an effective approach to improve the final accuracy of compressed model with PocketFlow in most situations of classification. User can set <code>--enbl_dst=True</code> to enable distillling.</p>
 <h2 id="group-tuning">Group Tuning</h2>
-<p>As introduced above, group tuning was proposed by the PocketFlow team and finding it is very useful to improve the performance of model compression. In PocketFlow, users can set the group number by <code>--list_group</code>, the default value is <code>1000</code>. User can also set the number of iterations to finetune by setting <code>nb_iters_ft_ratio</code> which mean the ratio the total iterations to be used in finetuning. The learning rate of finetuning can be set by <code>lrn_rate_ft</code>. </p>
+<p>As introduced above, group tuning was proposed by the PocketFlow team and finding it is very useful to improve the performance of model compression. In PocketFlow, users can set <code>--finetune=True</code> to enable group finetuning and set the group number by <code>--list_group</code>, the default value is <code>1000</code>. There is a trade-off between the small value and large value, because if the value is <code>1</code>, Pocketflow will prune convolution and finetune/retrain by each layer, which may have better effect but be more time-consuming. If we set the value large, the function will be less effective. User can also set the number of iterations to finetune by setting <code>nb_iters_ft_ratio</code> which mean the ratio the total iterations to be used in finetuning. The learning rate of finetuning can be set by <code>lrn_rate_ft</code>. </p>
 <p>[1] He, Y., Zhang, X. and Sun, J., 2017, October. Channel pruning for accelerating very deep neural networks. In <em>International Conference on Computer Vision (ICCV)</em> (Vol. 2, No. 6).</p>
 <p>[2] He, Y., Lin, J., Liu, Z., Wang, H., Li, L.J. and Han, S., 2018, September. Amc: Automl for model compression and acceleration on mobile devices. In  <em>Proceedings of the European Conference on Computer Vision (ECCV)</em>  (pp. 784-800).</p>
 <p>[3] Hinton, G., Vinyals, O. and Dean, J., 2015. Distilling the knowledge in a neural network. <em>arXiv preprint arXiv:1503.02531</em>.</p>
@@ -255,7 +264,7 @@ Add list <code>1.0, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 1.0,
         <a href="../dcp_learner/" class="btn btn-neutral float-right" title="Discrimination-aware Channel Pruning">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../self_defined_models/" class="btn btn-neutral" title="Self-defined Models"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../tutorial/" class="btn btn-neutral" title="Tutorial"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -281,7 +290,7 @@ Add list <code>1.0, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 1.0,
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../self_defined_models/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../tutorial/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../dcp_learner/" style="color: #fcfcfc">Next &raquo;</a></span>

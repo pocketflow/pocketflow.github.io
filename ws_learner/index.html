@@ -60,17 +60,12 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../quick_start/">Quick Start</a>
+    <a class="" href="../tutorial/">Tutorial</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <a class="" href="../self_defined_models/">Self-defined Models</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Learners</span>
+    <span class="caption-text">Learners - Algorithms</span>
     <ul class="subnav">
                 <li class="">
                     
@@ -85,6 +80,21 @@
     <a class="current" href="./">Weight Sparsification</a>
     <ul class="subnav">
             
+    <li class="toctree-l3"><a href="#weight-sparsification">Weight Sparsification</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#introduction">Introduction</a></li>
+        
+            <li><a class="toctree-l4" href="#algorithm-description">Algorithm Description</a></li>
+        
+            <li><a class="toctree-l4" href="#hyper-parameters">Hyper-parameters</a></li>
+        
+            <li><a class="toctree-l4" href="#usage-examples">Usage Examples</a></li>
+        
+        </ul>
+    
+
     </ul>
                 </li>
                 <li class="">
@@ -100,12 +110,17 @@
           
             <li class="toctree-l1">
 		
+    <span class="caption-text">Learners - Misc.</span>
+    <ul class="subnav">
+                <li class="">
+                    
     <a class="" href="../distillation/">Distillation</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../multi_gpu/">Multi-GPU Training</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../multi_gpu_training/">Multi-GPU Training</a>
+                </li>
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -115,6 +130,10 @@
                 <li class="">
                     
     <a class="" href="../reinforcement_learning/">Reinforcement Learning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../automl_based_methods/">AutoML-based Methods</a>
                 </li>
     </ul>
 	    </li>
@@ -141,6 +160,10 @@
                     
     <a class="" href="../test_cases/">Test Cases</a>
                 </li>
+                <li class="">
+                    
+    <a class="" href="../reference/">Reference</a>
+                </li>
     </ul>
 	    </li>
           
@@ -166,7 +189,7 @@
     
       
         
-          <li>Learners &raquo;</li>
+          <li>Learners - Algorithms &raquo;</li>
         
       
     
@@ -180,7 +203,140 @@
           <div role="main">
             <div class="section">
               
-                
+                <h1 id="weight-sparsification">Weight Sparsification</h1>
+<h2 id="introduction">Introduction</h2>
+<p>By imposing sparsity constraints on convolutional and fully-connected layers, the number of non-zero weights can be dramatically reduced, which leads to smaller model size and lower FLOPS for inference (actual acceleration depends on efficient implementation for sparse operations). Directly training a network with fixed sparsity degree may encounter some optimization difficulties and takes longer time to converge. To overcome this, Zhu &amp; Gupta proposed a dynamic pruning schedule to gradually remove network weights to simplify the optimization process (Zhu &amp; Gupta, 2017).</p>
+<p>Note: in this documentation, we will use both "sparsity" and "pruning ratio" to denote the ratio of zero-valued weights over all weights.</p>
+<h2 id="algorithm-description">Algorithm Description</h2>
+<p>For each convolutional kernel (for convolutional layer) or weighting matrix (for fully-connected layer), we create a binary mask of the same size to impose the sparsity constraint. During the forward pass, the convolutional kernel (or weighting matrix) is multiplied with the binary mask, so that some weights will not participate in the computation and also will not be updated via gradients. The binary mask is computed based on absolute values of weights: weight with the smallest absolute value will be masked-out until the desired sparsity is reached.</p>
+<p>During the training process, the sparsity is gradually increased to improve the overall optimization behaviour. The dynamic pruning schedule is defined as:</p>
+<div>
+<div class="MathJax_Preview">
+s_{t} = s_{f} - s_{f} \cdot \left( 1 - \frac{t - t_{b}}{t_{e} - t_{b}} \right)^{\alpha}, t \in \left[ t_{b}, t_{e} \right]
+</div>
+<script type="math/tex; mode=display">
+s_{t} = s_{f} - s_{f} \cdot \left( 1 - \frac{t - t_{b}}{t_{e} - t_{b}} \right)^{\alpha}, t \in \left[ t_{b}, t_{e} \right]
+</script>
+</div>
+<p>where <span><span class="MathJax_Preview">s_{t}</span><script type="math/tex">s_{t}</script></span> is the sparsity at iteration #<span><span class="MathJax_Preview">t</span><script type="math/tex">t</script></span>, <span><span class="MathJax_Preview">s_{f}</span><script type="math/tex">s_{f}</script></span> is the target sparsity, <span><span class="MathJax_Preview">t_{b}</span><script type="math/tex">t_{b}</script></span> and <span><span class="MathJax_Preview">t_{e}</span><script type="math/tex">t_{e}</script></span> are the iteration indices where the sparsity begins and stops increasing, and <span><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> is the exponent term. In the actual implementation, the binary mask is not updated at each iteration. Instead, it is updated every <span><span class="MathJax_Preview">\Delta t</span><script type="math/tex">\Delta t</script></span> iterations so as to stabilize the training process. We visualize the dynamic pruning schedule in the figure below.</p>
+<p><img alt="WSL PR Schedule" src="../wsl_pr_schedule.png" /></p>
+<p>Most networks consist of multiple layers, and the weight redundancy may differ from one layer to another. In order to maximally exploit the weight redundancy, we incorporate a reinforcement learning controller to automatically determine the optimal sparsity (or pruning ratio) for each layer. In each roll-out, the RL agent sequentially determine the sparsity for each layer, and then the network is pruned and re-trained for a few iterations using layer-wise regression &amp; global fine-tuning. The reward function's value is computed based on the re-trained network's accuracy (and computation efficiency), and then used update model parameters of RL agent. For more details, please refer to the documentation named "Hyper-parameter Optimizer - Reinforcement Learning".</p>
+<h2 id="hyper-parameters">Hyper-parameters</h2>
+<p>Below is the full list of hyper-parameters used in the weight sparsification learner:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>ws_save_path</code></td>
+<td align="left">model's save path</td>
+</tr>
+<tr>
+<td align="left"><code>ws_prune_ratio</code></td>
+<td align="left">target pruning ratio</td>
+</tr>
+<tr>
+<td align="left"><code>ws_prune_ratio_prtl</code></td>
+<td align="left">pruning ratio protocol: 'uniform' / 'heurist' / 'optimal'</td>
+</tr>
+<tr>
+<td align="left"><code>ws_nb_rlouts</code></td>
+<td align="left">number of roll-outs for the RL agent</td>
+</tr>
+<tr>
+<td align="left"><code>ws_nb_rlouts_min</code></td>
+<td align="left">minimal number of roll-outs for the RL agent to start training</td>
+</tr>
+<tr>
+<td align="left"><code>ws_reward_type</code></td>
+<td align="left">reward type: 'single-obj' / 'multi-obj'</td>
+</tr>
+<tr>
+<td align="left"><code>ws_lrn_rate_rg</code></td>
+<td align="left">learning rate for layer-wise regression</td>
+</tr>
+<tr>
+<td align="left"><code>ws_nb_iters_rg</code></td>
+<td align="left">number of iterations for layer-wise regression</td>
+</tr>
+<tr>
+<td align="left"><code>ws_lrn_rate_ft</code></td>
+<td align="left">learning rate for global fine-tuning</td>
+</tr>
+<tr>
+<td align="left"><code>ws_nb_iters_ft</code></td>
+<td align="left">number of iterations for global fine-tuning</td>
+</tr>
+<tr>
+<td align="left"><code>ws_nb_iters_feval</code></td>
+<td align="left">number of iterations for fast evaluation</td>
+</tr>
+<tr>
+<td align="left"><code>ws_prune_ratio_exp</code></td>
+<td align="left">pruning ratio's exponent term</td>
+</tr>
+<tr>
+<td align="left"><code>ws_iter_ratio_beg</code></td>
+<td align="left">iteration ratio at which the pruning ratio begins increasing</td>
+</tr>
+<tr>
+<td align="left"><code>ws_iter_ratio_end</code></td>
+<td align="left">iteration ratio at which the pruning ratio stops increasing</td>
+</tr>
+<tr>
+<td align="left"><code>ws_mask_update_step</code></td>
+<td align="left">step size for updating the pruning mask</td>
+</tr>
+</tbody>
+</table>
+<p>Here, we provide detailed description (and some analysis) for above hyper-parameters:</p>
+<ul>
+<li><code>ws_save_path</code>: save path for model created in the training graph. The resulting checkpoint files can be used to resume training from a previous run and compute model's loss function's value and some other evaluation metrics.</li>
+<li><code>ws_prune_ratio</code>: target pruning ratio for convolutional &amp; fully-connected layers. The larger <code>ws_prune_ratio</code> is, the more weights will be pruned. If <code>ws_prune_ratio</code> equals 0, then no weights will be pruned and model remains the same; if <code>ws_prune_ratio</code> equals 1, then all weights are pruned.</li>
+<li><code>ws_prune_ratio_prtl</code>: pruning ratio protocol. Possible options include: 1) uniform: all layers use the same pruning ratio; 2) heurist: the more weights in one layer, the higher pruning ratio will be; 3) optimal: each layer's pruning ratio is determined by reinforcement learning.</li>
+<li><code>ws_nb_rlouts</code>: number of roll-outs for training the reinforcement learning agent. A roll-out refers to: use the RL agent to determine the pruning ratio for each layer; fine-tune the weight sparsified network; evaluate the fine-tuned network to obtain the reward value.</li>
+<li><code>ws_nb_rlouts_min</code>: minimal number of roll-outs for the RL agent to start training. The RL agent requires a few roll-outs for random exploration before actual training starts. We recommend to set this to be a quarter of <code>ws_nb_rlouts</code>.</li>
+<li><code>ws_reward_type</code>: reward function's type for the RL agent. Possible options include: 1) single-obj: the reward function only depends on the compressed model's accuracy (the sparsity constraint is imposed during roll-out); 2) multi-obj: the reward function depends on both the compressed model's accuracy and the actual sparsity.</li>
+<li><code>ws_lrn_rate_rg</code>: learning rate for layer-wise regression.</li>
+<li><code>ws_nb_iters_rg</code>: number of iterations for layer-wise regression. This should be set to some value that the layer-wise regression can almost converge and the loss function's value does not decrease much even if more iterations are used.</li>
+<li><code>ws_lrn_rate_ft</code>: learning rate for global fine-tuning.</li>
+<li><code>ws_nb_iters_ft</code>: number of iterations for global fine-tuning. This should be set to some value that the global fine-tuning can almost converge and the loss function's value does not decrease much even if more iterations are used.</li>
+<li><code>ws_nb_iters_feval</code>: number of iterations for fast evaluation. In each roll-out, the re-trained network is evaluated on a subset of evaluation data to save time.</li>
+<li><code>ws_prune_ratio_exp</code>: pruning ratio's exponent term as defined in the dynamic pruning schedule above.</li>
+<li><code>ws_iter_ratio_beg</code>: iteration ratio at which the pruning ratio begins increasing. In the dynamic pruning schedule defined above, <span><span class="MathJax_Preview">t_{b}</span><script type="math/tex">t_{b}</script></span> equals to the total number of training iterations multiplied with <code>ws_iter_ratio_beg</code>.</li>
+<li><code>ws_iter_ratio_end</code>: iteration ratio at which the pruning ratio stops increasing. In the dynamic pruning schedule defined above, <span><span class="MathJax_Preview">t_{e}</span><script type="math/tex">t_{e}</script></span> equals to the total number of training iterations multiplied with <code>ws_iter_ratio_end</code>.</li>
+<li><code>ws_mask_update_step</code>: step size for updating the pruning mask. By increasing <code>ws_mask_update_step</code>, binary masks for weight pruning are less frequently updated, which will speed-up the training but the difference between pre-update and post-update sparsity will be larger.</li>
+</ul>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>In this section, we provide some usage examples to demonstrate how to use <code>WeightSparseLearner</code> under different execution modes and hyper-parameter combinations:</p>
+<p>To compress a ResNet-20 model for CIFAR-10 classification task in the local mode, use:</p>
+<pre><code class="bash"># set the target pruning ratio to 0.75
+./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+    --learner weight-sparse \
+    --ws_prune_ratio 0.75
+</code></pre>
+
+<p>To compress a ResNet-34 model for ILSVRC-12 classification task in the docker mode with 4 GPUs, use:</p>
+<pre><code class="bash"># set the number of channel pruning stages to 4
+./scripts/run_docker.sh nets/resnet_at_ilsvrc12_run.py -n=4 \
+    --learner weight-sparse \
+    --data_disk docker \
+    --resnet_size 34 \
+    --dcp_nb_stages 4
+</code></pre>
+
+<p>To compress a MobileNet-v2 model for ILSVRC-12 classification task in the seven mode with 8 GPUs, use:</p>
+<pre><code class="bash"># enable training with distillation loss
+./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py -n=8 \
+    --learner weight-sparse \
+    --data_disk seven \
+    --mobilenet_version 2 \
+    --enbl_dst
+</code></pre>
               
             </div>
           </div>

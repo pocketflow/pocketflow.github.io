@@ -64,6 +64,8 @@
         
             <li><a class="toctree-l3" href="#clone-pocketflow">Clone PocketFlow</a></li>
         
+            <li><a class="toctree-l3" href="#create-a-path-configuration-file">Create a Path Configuration File</a></li>
+        
             <li><a class="toctree-l3" href="#prepare-for-the-local-mode">Prepare for the Local Mode</a></li>
         
             <li><a class="toctree-l3" href="#prepare-for-the-docker-mode">Prepare for the Docker Mode</a></li>
@@ -78,17 +80,12 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../quick_start/">Quick Start</a>
+    <a class="" href="../tutorial/">Tutorial</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <a class="" href="../self_defined_models/">Self-defined Models</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Learners</span>
+    <span class="caption-text">Learners - Algorithms</span>
     <ul class="subnav">
                 <li class="">
                     
@@ -115,12 +112,17 @@
           
             <li class="toctree-l1">
 		
+    <span class="caption-text">Learners - Misc.</span>
+    <ul class="subnav">
+                <li class="">
+                    
     <a class="" href="../distillation/">Distillation</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../multi_gpu/">Multi-GPU Training</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../multi_gpu_training/">Multi-GPU Training</a>
+                </li>
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -130,6 +132,10 @@
                 <li class="">
                     
     <a class="" href="../reinforcement_learning/">Reinforcement Learning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../automl_based_methods/">AutoML-based Methods</a>
                 </li>
     </ul>
 	    </li>
@@ -155,6 +161,10 @@
                 <li class="">
                     
     <a class="" href="../test_cases/">Test Cases</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../reference/">Reference</a>
                 </li>
     </ul>
 	    </li>
@@ -192,18 +202,36 @@
             <div class="section">
               
                 <h1 id="installation">Installation</h1>
-<p>PocketFlow is developed and tested on Linux, using Python 3.x and TensorFlow 1.10.0. We support the following three execution modes for PocketFlow:</p>
+<p>PocketFlow is developed and tested on Linux, using Python 3.6 and TensorFlow 1.10.0. We support the following three execution modes for PocketFlow:</p>
 <ul>
 <li>Local mode: run PocketFlow on the local machine.</li>
 <li>Docker mode: run PocketFlow within a docker image.</li>
-<li>Seven mode: run PocketFlow on the seven cluster.</li>
+<li>Seven mode: run PocketFlow on the seven cluster (only available within Tencent).</li>
 </ul>
-<p>We recommend to use Anaconda as the Python environment, and then install TensorFlow with pip. Alternatively, you may download our pre-built docker image, which integrates TensorFlow and <a href="https://github.com/uber/horovod">Horovod</a>, an open-source distributed training framework if multi-GPU training is favored.</p>
 <h2 id="clone-pocketflow">Clone PocketFlow</h2>
 <p>To make a local copy of the PocketFlow repository, use:</p>
 <pre><code class="bash">$ git clone http://git.code.oa.com/ml/PocketFlow.git
 </code></pre>
 
+<h2 id="create-a-path-configuration-file">Create a Path Configuration File</h2>
+<p>PocketFlow requires a path configuration file, named <code>path.conf</code>, to setup directory paths to data sets and pre-trained models under different execution modes, as well as HDFS / HTTP connection parameters.</p>
+<p>We have provided a template file to help you create your own path configuration file. You can find it in the PocketFlow repository, named <code>path.conf.template</code>, which contains more detailed descriptions on how to customize path configurations. For instance, if you want to use CIFAR-10 and ImageNet data sets stored on the local machine, then the path configuration file should look like this:</p>
+<pre><code class="bash"># data files
+data_hdfs_host = None
+data_dir_local_cifar10 = /home/user_name/datasets/cifar-10-batches-bin  # this line has been edited!
+data_dir_hdfs_cifar10 = None
+data_dir_seven_cifar10 = None
+data_dir_docker_cifar10 = /opt/ml/data  # DO NOT EDIT
+data_dir_local_ilsvrc12 = /home/user_name/datasets/imagenet_tfrecord  # this line has been edited!
+data_dir_hdfs_ilsvrc12 = None
+data_dir_seven_ilsvrc12 = None
+data_dir_docker_ilsvrc12 = /opt/ml/data  # DO NOT EDIT
+
+# model files
+model_http_url = https://api.ai.tencent.com/pocketflow
+</code></pre>
+
+<p>In short, you need to replace "None" in the template file with the actual path (or HDFS / HTTP connection parameters) if available, or leave it unchanged otherwise.</p>
 <h2 id="prepare-for-the-local-mode">Prepare for the Local Mode</h2>
 <p>We recommend to use Anaconda as the Python environment, which has many essential packages built-in. The Anaconda installer can be downloaded from <a href="https://www.anaconda.com/download/#linux">here</a>. To install, use the following command:</p>
 <pre><code class="bash"># install Anaconda; replace the installer's file name if needed
@@ -227,13 +255,7 @@ $ python -c &quot;import tensorflow as tf; print(tf.__version__)&quot;
 </code></pre>
 
 <p>To run PocketFlow in the local mode, <em>e.g.</em> to train a full-precision ResNet-20 model for the CIFAR-10 classification task, use the following command:</p>
-<pre><code class="bash"># DATA_DIR_LOCAL: directory path to the CIFAR-10 data set on the local machine
-# HDFS_URL: IP address of HDFS namenode, prefixed with protocol, followed by WebHDFS port
-$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
-    --learner full-prec \
-    --data_disk local \
-    --data_dir_local ${DATA_DIR_LOCAL} \
-    --hdfs_url ${HDFS_URL}
+<pre><code class="bash">$ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py
 </code></pre>
 
 <h2 id="prepare-for-the-docker-mode">Prepare for the Docker Mode</h2>
@@ -243,25 +265,13 @@ $ docker pull uber/horovod
 </code></pre>
 
 <p>To run PocketFlow in the docker mode, <em>e.g.</em> to train a full-precision ResNet-20 model for the CIFAR-10 classification task, use the following command:</p>
-<pre><code class="bash"># DATA_DIR_LOCAL: directory path to the CIFAR-10 data set on the local machine
-# HDFS_URL: IP address of HDFS namenode, prefixed with protocol, followed by WebHDFS port
-$ ./scripts/run_docker.sh nets/resnet_at_cifar10_run.py ${DATA_DIR_LOCAL} \
-    --learner full-prec \
-    --data_disk local \
-    --data_dir_local /opt/ml/data \
-    --hdfs_url ${HDFS_URL}
+<pre><code class="bash">$ ./scripts/run_docker.sh nets/resnet_at_cifar10_run.py
 </code></pre>
 
 <h2 id="prepare-for-the-seven-mode">Prepare for the Seven Mode</h2>
 <p>Seven is a distributed learning platform built for both CPU and GPU clusters. Users can submit tasks to the seven cluster, using built-in data sets and docker images seamlessly. For detailed introduction, please refer to its <a href="http://git.code.oa.com/ml/seven-doc/blob/master/seven/seven-client.md">documentation site</a>.</p>
 <p>To run PocketFlow in the seven mode, <em>e.g.</em> to train a full-precision ResNet-20 model for the CIFAR-10 classification task, use the following command:</p>
-<pre><code class="bash"># DATA_DIR_SEVEN: directory path to the CIFAR-10 data set on the seven cluster
-# HDFS_URL: IP address of HDFS namenode, prefixed with protocol, followed by WebHDFS port
-$ ./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
-    --learner full-prec \
-    --data_disk seven \
-    --data_dir_seven ${DATA_DIR_SEVEN} \
-    --hdfs_url ${HDFS_URL}
+<pre><code class="bash">$ ./scripts/run_seven.sh nets/resnet_at_cifar10_run.py
 </code></pre>
               
             </div>
@@ -270,7 +280,7 @@ $ ./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../quick_start/" class="btn btn-neutral float-right" title="Quick Start">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../tutorial/" class="btn btn-neutral float-right" title="Tutorial">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -302,7 +312,7 @@ $ ./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
         <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../quick_start/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../tutorial/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

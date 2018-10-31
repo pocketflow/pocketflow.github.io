@@ -60,17 +60,12 @@
           
             <li class="toctree-l1">
 		
-    <a class="" href="../quick_start/">Quick Start</a>
+    <a class="" href="../tutorial/">Tutorial</a>
 	    </li>
           
             <li class="toctree-l1">
 		
-    <a class="" href="../self_defined_models/">Self-defined Models</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Learners</span>
+    <span class="caption-text">Learners - Algorithms</span>
     <ul class="subnav">
                 <li class="">
                     
@@ -95,17 +90,31 @@
     </ul>
 	    </li>
           
-            <li class="toctree-l1 current">
+            <li class="toctree-l1">
 		
+    <span class="caption-text">Learners - Misc.</span>
+    <ul class="subnav">
+                <li class=" current">
+                    
     <a class="current" href="./">Distillation</a>
     <ul class="subnav">
             
+    <li class="toctree-l3"><a href="#knowledge-distilation">Knowledge Distilation</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#compression-with-other-model-compression-approaches">Compression with Other Model Compression Approaches</a></li>
+        
+        </ul>
+    
+
     </ul>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../multi_gpu/">Multi-GPU Training</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../multi_gpu_training/">Multi-GPU Training</a>
+                </li>
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -115,6 +124,10 @@
                 <li class="">
                     
     <a class="" href="../reinforcement_learning/">Reinforcement Learning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../automl_based_methods/">AutoML-based Methods</a>
                 </li>
     </ul>
 	    </li>
@@ -141,6 +154,10 @@
                     
     <a class="" href="../test_cases/">Test Cases</a>
                 </li>
+                <li class="">
+                    
+    <a class="" href="../reference/">Reference</a>
+                </li>
     </ul>
 	    </li>
           
@@ -165,6 +182,10 @@
     <li><a href="..">Docs</a> &raquo;</li>
     
       
+        
+          <li>Learners - Misc. &raquo;</li>
+        
+      
     
     <li>Distillation</li>
     <li class="wy-breadcrumbs-aside">
@@ -176,7 +197,23 @@
           <div role="main">
             <div class="section">
               
-                
+                <h1 id="knowledge-distilation">Knowledge Distilation</h1>
+<p>wledge Distillation
+Knowledge Distillation is a kind of model compression approach in which a pre-trained large model teaches a smaller model to achieve the similar prediction capacity. It often named 'teacher-student' training, where the large model is the teacher and the smaller model is the student. The implementation used in PocketFlow is based on <a href="https://nervanasystems.github.io/distiller/knowledge_distillation/index.html#hinton-et-al-2015">Hinton et al., 2015</a>. </p>
+<p>With distillation, knowledge can be transferred from the teacher model to the student by minimizing a loss function where the target is the distribution of class probabilities predicted by the teacher model. In most situations, the probability of the correct class predicted by the teacher model is very high, and the probabilities of other classes are closed to 0, which may provide very limited information beyond the ground truth labels. We can use the class probabilities produced by the cumbersome model as "soft targets" for training the small model. The solution is to raise the temperature of the final softmax until the cumbersome model produces a suitably soft set of targets.  The probability <span><span class="MathJax_Preview">q_i</span><script type="math/tex">q_i</script></span> of class <span><span class="MathJax_Preview">i</span><script type="math/tex">i</script></span> is calculated from the logits <span><span class="MathJax_Preview">z_i</span><script type="math/tex">z_i</script></span>:</p>
+<div>
+<div class="MathJax_Preview">q_i = \frac{exp(z_i / T)}{\sum_j{exp(z_j/T)}}</div>
+<script type="math/tex; mode=display">q_i = \frac{exp(z_i / T)}{\sum_j{exp(z_j/T)}}</script>
+</div>
+<p>where <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span> is the temperature. As <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span> grows, the probability distribution is more softer, providing more information as to which classes the cumbersome model more similar to the predicted class. It is better to include the standard loss (<span><span class="MathJax_Preview">T=1</span><script type="math/tex">T=1</script></span>) between the predicted class probabilities and the ground-truth labels.  The overall loss function is:</p>
+<div>
+<div class="MathJax_Preview">L(x;W)=H(y,\sigma(z_s;T=1))+\alpha*H(\sigma(z_t;T=\tau),\sigma(z_s,T=\tau))</div>
+<script type="math/tex; mode=display">L(x;W)=H(y,\sigma(z_s;T=1))+\alpha*H(\sigma(z_t;T=\tau),\sigma(z_s,T=\tau))</script>
+</div>
+<p>where <span><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span> is the input, <span><span class="MathJax_Preview">W</span><script type="math/tex">W</script></span> are parameters of the distilled small model and <span><span class="MathJax_Preview">y</span><script type="math/tex">y</script></span> is the ground truth label,  <span><span class="MathJax_Preview">\sigma</span><script type="math/tex">\sigma</script></span> is the softmax parameterized by temperature <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span>, <span><span class="MathJax_Preview">H</span><script type="math/tex">H</script></span> is the cross entropy loss. <span><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> is the coefficient of the distillation loss. User can set <span><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> by <code>loss_w_dst</code> and set temperature <span><span class="MathJax_Preview">\tau</span><script type="math/tex">\tau</script></span> by <code>--tempr_dst</code>. </p>
+<h3 id="compression-with-other-model-compression-approaches">Compression with Other Model Compression Approaches</h3>
+<p>For other model model compression techniques such as channel pruning, weight pruning and quantization can be combined with the knowledge distilling. To use it, just enable it by setting <code>--enbl_dst=True</code>.</p>
+<p>[1] Hinton, G., Vinyals, O. and Dean, J., 2015. Distilling the knowledge in a neural network. <em>arXiv preprint arXiv:1503.02531</em>.</p>
               
             </div>
           </div>
@@ -184,7 +221,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../multi_gpu/" class="btn btn-neutral float-right" title="Multi-GPU Training">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../multi_gpu_training/" class="btn btn-neutral float-right" title="Multi-GPU Training">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../nuq_learner/" class="btn btn-neutral" title="Non-uniform Quantization"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -216,7 +253,7 @@
         <span><a href="../nuq_learner/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../multi_gpu/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../multi_gpu_training/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
