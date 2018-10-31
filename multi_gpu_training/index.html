@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Multi-GPU Training - PocketFlow Docs</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Multi-GPU Training";
+    var mkdocs_page_input_path = "multi_gpu_training.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> PocketFlow Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../installation/">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../tutorial/">Tutorial</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Learners - Algorithms</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../cp_learner/">Channel Pruning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../dcp_learner/">Discrimination-aware Channel Pruning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../ws_learner/">Weight Sparsification</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../uq_learner/">Uniform Quantization</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../nuq_learner/">Non-uniform Quantization</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Learners - Misc.</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../distillation/">Distillation</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Multi-GPU Training</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#multi-gpu-training">Multi-GPU Training</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#from-single-gpu-to-multi-gpu">From Single-GPU to Multi-GPU</a></li>
+        
+            <li><a class="toctree-l4" href="#usage-example">Usage Example</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Hyper-parameter Optimizers</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../reinforcement_learning/">Reinforcement Learning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../automl_based_methods/">AutoML-based Methods</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../performance/">Performance</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../faq/">Frequently Asked Questions</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Appendix</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../pre_trained_models/">Pre-trained Models</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../test_cases/">Test Cases</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../reference/">Reference</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">PocketFlow Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Learners - Misc. &raquo;</li>
+        
+      
+    
+    <li>Multi-GPU Training</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="multi-gpu-training">Multi-GPU Training</h1>
+<p>Due to the high computational complexity, it often takes hours or even days to fully train deep learning models using a single GPU.
+In PocketFlow, we adopt multi-GPU training to speed-up this time-consuming training process.
+Our implementation is compatible with:</p>
+<ul>
+<li><a href="https://github.com/uber/horovod">Horovod</a>: a distributed training framework for TensorFlow, Keras, and PyTorch.</li>
+<li><a href="http://git.code.oa.com/ml/tfplus-doc-examples">TF-Plus</a>: an optimized framework for TensorFlow-based distributed training (only available within Tencent).</li>
+</ul>
+<p>We have provide a wrapper class, <code>MultiGpuWrapper</code>, to seamlessly switch between the above two frameworks.
+It will sequentially check whether Horovod and TF-Plus can be used, and use the first available one as the underlying framework for multi-GPU training.</p>
+<p>The main reason that using Horovod or TF-Plus instead TensorFlow's original distributed training routine is that these framewors provide many easy-to-use APIs and require far less code changes to change from single-GPU to multi-GPU training, as we shall see later.</p>
+<h2 id="from-single-gpu-to-multi-gpu">From Single-GPU to Multi-GPU</h2>
+<p>To extend a single-GPU based training script to the multi-GPU scenario, at most 7 steps are needed:</p>
+<ul>
+<li>Import the Horovod or TF-Plus module.</li>
+</ul>
+<pre><code class="Python">from utils.multi_gpu_wrapper import MultiGpuWrapper as mgw
+</code></pre>
+
+<ul>
+<li>Initialize the multi-GPU training framework, as early as possible.</li>
+</ul>
+<pre><code class="Python">mgw.init()
+</code></pre>
+
+<ul>
+<li>For each worker, create a session with a distinct GPU device.</li>
+</ul>
+<pre><code class="Python">config = tf.ConfigProto()
+config.gpu_options.visible_device_list = str(mgw.local_rank())
+sess = tf.Session(config=config)
+</code></pre>
+
+<ul>
+<li>(Optional) Let each worker use a distinct subset of training data.</li>
+</ul>
+<pre><code class="Python">filenames = tf.data.Dataset.list_files(file_pattern, shuffle=True)
+filenames = filenames.shard(mgw.size(), mgw.rank())
+</code></pre>
+
+<ul>
+<li>Wrapper the optimizer for distributed gradient communication.</li>
+</ul>
+<pre><code class="Python">optimizer = tf.train.AdamOptimizer(learning_rate=lrn_rate)
+optimizer = mgw.DistributedOptimizer(optimizer)
+train_op = optimizer.minimize(loss)
+</code></pre>
+
+<ul>
+<li>Synchronize master's parameters to all the other workers.</li>
+</ul>
+<pre><code class="Python">bcast_op = mgw.broadcast_global_variables(0)
+sess.run(tf.global_variables_initializer())
+sess.run(bcast_op)
+</code></pre>
+
+<ul>
+<li>(Optional) Save checkpoint files at the master node periodically.</li>
+</ul>
+<pre><code class="Python">if mgw.rank() == 0:
+  saver.save(sess, save_path, global_step)
+</code></pre>
+
+<h2 id="usage-example">Usage Example</h2>
+<p>Here, we provide a code snippet to demonstrate how to use multi-GPU training to speed-up training.
+Please note that many implementation details are omitted for clarity.</p>
+<pre><code class="Python">import tensorflow as tf
+from utils.multi_gpu_wrapper import MultiGpuWrapper as mgw
+
+# initialization
+mgw.init()
+
+# create the training graph
+with tf.Graph().as_default():
+  # create a TensorFlow session
+  config = tf.ConfigProto()
+  config.gpu_options.visible_device_list = str(mgw.local_rank())
+  sess = tf.Session(config=config)
+
+  # use tf.data.Dataset() to traverse images and labels
+  filenames = tf.data.Dataset.list_files(file_pattern, shuffle=True)
+  filenames = filenames.shard(mgw.size(), mgw.rank())
+  images, labels = get_images_n_labels(filenames)
+
+  # define the network and its loss function
+  logits = forward_pass(images)
+  loss = calc_loss(labels, logits)
+
+  # create an optimizer and setup training-related operations
+  global_step = tf.train.get_or_create_global_step()
+  optimizer = tf.train.AdamOptimizer(learning_rate=lrn_rate)
+  optimizer = mgw.DistributedOptimizer(optimizer)
+  train_op = optimizer.minimize(loss, global_step=global_step)
+  bcast_op = mgw.broadcast_global_variables(0)
+
+# multi-GPU training
+sess.run(tf.global_variables_initializer())
+sess.run(bcast_op)
+for idx_iter in range(nb_iters):
+  sess.run(train_op)
+  if mgw.rank() == 0 and (idx_iter + 1) % save_step == 0:
+    saver.save(sess, save_path, global_step)
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../reinforcement_learning/" class="btn btn-neutral float-right" title="Reinforcement Learning">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../distillation/" class="btn btn-neutral" title="Distillation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../distillation/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../reinforcement_learning/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../mathjax-config.js" defer></script>
+      <script src="../MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>
