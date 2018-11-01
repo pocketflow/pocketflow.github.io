@@ -63,7 +63,7 @@
     <a class="current" href="./">Tutorial</a>
     <ul class="subnav">
             
-    <li class="toctree-l2"><a href="#quick-start">Quick Start</a></li>
+    <li class="toctree-l2"><a href="#tutorial">Tutorial</a></li>
     
         <ul>
         
@@ -203,7 +203,7 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="quick-start">Quick Start</h1>
+                <h1 id="tutorial">Tutorial</h1>
 <p>In this tutorial, we demonstrate how to compress a convolutional neural network and export the compressed model into a *.tflite file for deployment on mobile devices. The model we used here is a 18-layer residual network (denoted as "ResNet-18") trained for the ImageNet classification task. We will compress it with the discrimination-aware channel pruning algorithm (Zhuang et al., NIPS '18) to reduce the number of convolutional channels used in the network for speed-up.</p>
 <h2 id="prepare-the-data">Prepare the Data</h2>
 <p>To start with, we need to convert the ImageNet data set (ILSVRC-12) into TensorFlow's native TFRecord file format. You may follow the data preparation guide <a href="https://github.com/tensorflow/models/tree/master/research/inception#getting-started">here</a> to download the full data set and convert it into TFRecord files. After that, you should be able to find 4,096 training files and 128 validation files in the data directory, like this:</p>

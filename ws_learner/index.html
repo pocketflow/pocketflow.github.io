@@ -219,7 +219,7 @@ s_{t} = s_{f} - s_{f} \cdot \left( 1 - \frac{t - t_{b}}{t_{e} - t_{b}} \right)^{
 </script>
 </div>
 <p>where <span><span class="MathJax_Preview">s_{t}</span><script type="math/tex">s_{t}</script></span> is the sparsity at iteration #<span><span class="MathJax_Preview">t</span><script type="math/tex">t</script></span>, <span><span class="MathJax_Preview">s_{f}</span><script type="math/tex">s_{f}</script></span> is the target sparsity, <span><span class="MathJax_Preview">t_{b}</span><script type="math/tex">t_{b}</script></span> and <span><span class="MathJax_Preview">t_{e}</span><script type="math/tex">t_{e}</script></span> are the iteration indices where the sparsity begins and stops increasing, and <span><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> is the exponent term. In the actual implementation, the binary mask is not updated at each iteration. Instead, it is updated every <span><span class="MathJax_Preview">\Delta t</span><script type="math/tex">\Delta t</script></span> iterations so as to stabilize the training process. We visualize the dynamic pruning schedule in the figure below.</p>
-<p><img alt="WSL PR Schedule" src="../wsl_pr_schedule.png" /></p>
+<p><img alt="WSL PR Schedule" src="../pics/wsl_pr_schedule.png" /></p>
 <p>Most networks consist of multiple layers, and the weight redundancy may differ from one layer to another. In order to maximally exploit the weight redundancy, we incorporate a reinforcement learning controller to automatically determine the optimal sparsity (or pruning ratio) for each layer. In each roll-out, the RL agent sequentially determine the sparsity for each layer, and then the network is pruned and re-trained for a few iterations using layer-wise regression &amp; global fine-tuning. The reward function's value is computed based on the re-trained network's accuracy (and computation efficiency), and then used update model parameters of RL agent. For more details, please refer to the documentation named "Hyper-parameter Optimizer - Reinforcement Learning".</p>
 <h2 id="hyper-parameters">Hyper-parameters</h2>
 <p>Below is the full list of hyper-parameters used in the weight sparsification learner:</p>
@@ -321,19 +321,17 @@ s_{t} = s_{f} - s_{f} \cdot \left( 1 - \frac{t - t_{b}}{t_{e} - t_{b}} \right)^{
 </code></pre>
 
 <p>To compress a ResNet-34 model for ILSVRC-12 classification task in the docker mode with 4 GPUs, use:</p>
-<pre><code class="bash"># set the number of channel pruning stages to 4
+<pre><code class="bash"># set the pruning ratio protocol to &quot;heurist&quot;
 ./scripts/run_docker.sh nets/resnet_at_ilsvrc12_run.py -n=4 \
     --learner weight-sparse \
-    --data_disk docker \
     --resnet_size 34 \
-    --dcp_nb_stages 4
+    --ws_prune_ratio_prtl heurist
 </code></pre>
 
 <p>To compress a MobileNet-v2 model for ILSVRC-12 classification task in the seven mode with 8 GPUs, use:</p>
 <pre><code class="bash"># enable training with distillation loss
 ./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py -n=8 \
     --learner weight-sparse \
-    --data_disk seven \
     --mobilenet_version 2 \
     --enbl_dst
 </code></pre>

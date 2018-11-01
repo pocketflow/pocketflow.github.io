@@ -197,8 +197,8 @@
 <p>PocketFlow is an open-source framework for compressing and accelerating deep learning models with minimal human effort. Deep learning is widely used in various areas, such as computer vision, speech recognition, and natural language translation. However, deep learning models are often computational expensive, which limits further applications on mobile devices with limited computational resources.</p>
 <p>PocketFlow aims at providing an easy-to-use toolkit for developers to improve the inference efficiency with little or no performance degradation. Developers only needs to specify the desired compression and/or acceleration ratios and then PocketFlow will automatically choose proper hyper-parameters to generate a highly efficient compressed model for deployment.</p>
 <h2 id="framework">Framework</h2>
-<p>The proposed framework mainly consists of two categories of algorithm components, \ie learners and hyper-parameter optimizers, as depicted in the figure below. Given an uncompressed original model, the learner module generates a candidate compressed model using some randomly chosen hyper-parameter combination. The candidate model's accuracy and computation efficiency is then evaluated and used by hyper-parameter optimizer module as the feedback signal to determine the next hyper-parameter combination to be explored by the learner module. After a few iterations, the best one of all the candidate models is output as the final compressed model.</p>
-<p><img alt="Framework Design" src="framework_design.png" /></p>
+<p>The proposed framework mainly consists of two categories of algorithm components, <em>i.e.</em> learners and hyper-parameter optimizers, as depicted in the figure below. Given an uncompressed original model, the learner module generates a candidate compressed model using some randomly chosen hyper-parameter combination. The candidate model's accuracy and computation efficiency is then evaluated and used by hyper-parameter optimizer module as the feedback signal to determine the next hyper-parameter combination to be explored by the learner module. After a few iterations, the best one of all the candidate models is output as the final compressed model.</p>
+<p><img alt="Framework Design" src="pics/framework_design.png" /></p>
 <h3 id="learners">Learners</h3>
 <p>A learner refers to some model compression algorithm augmented with several training techniques as shown in the figure above. Below is a list of model compression algorithms supported in PocketFlow:</p>
 <table>
@@ -289,6 +289,6 @@
 </html>
 
 <!--
-MkDocs version : 1.0.3
-Build Date UTC : 2018-10-31 13:37:02
+MkDocs version : 1.0.4
+Build Date UTC : 2018-11-01 03:08:24
 -->

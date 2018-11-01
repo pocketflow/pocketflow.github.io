@@ -219,7 +219,7 @@
 </div>
 <p>where <span><span class="MathJax_Preview">c'_{i} \lt c_{i}</span><script type="math/tex">c'_{i} \lt c_{i}</script></span>, then the convolutional layer simplified to with <span><span class="MathJax_Preview">c'_{i}</span><script type="math/tex">c'_{i}</script></span> input channels only, and the computational complexity is reduced by a ratio of <span><span class="MathJax_Preview">\frac{c_{i} - c'_{i}}{c_{i}}</span><script type="math/tex">\frac{c_{i} - c'_{i}}{c_{i}}</script></span>.</p>
 <p>In order to reduce the performance degradation caused by channel pruning, the DCP algorithm introduces a novel channel selection algorithm by incorporating additional discrimination-aware and reconstruction loss terms, as shown below.</p>
-<p><img alt="DCP Learner" src="../dcp_learner.png" />
+<p><img alt="DCP Learner" src="../pics/dcp_learner.png" />
 <strong>Source:</strong> Zhuang et al., <em>Discrimination-aware Channel Pruning for Deep Neural Networks</em>. NIPS '18.</p>
 <p>The network is evenly divided into <span><span class="MathJax_Preview">\left( P + 1 \right)</span><script type="math/tex">\left( P + 1 \right)</script></span> blocks. For each of the first <span><span class="MathJax_Preview">P</span><script type="math/tex">P</script></span> blocks, an extra branch is derived from the output feature map of this block's last layer. The output feature map is then passed through batch normalization &amp; ReLU &amp; average pooling &amp; softmax layers to produce predictions, from which a discrimination-aware loss is constructed, denoted as <span><span class="MathJax_Preview">L_{p}</span><script type="math/tex">L_{p}</script></span>. For the last block, the final loss of whole network, denoted as <span><span class="MathJax_Preview">L</span><script type="math/tex">L</script></span>, is used as its discrimination-aware loss. Additionally, for each layer in the channel pruned network, a reconstruction loss is introduced to force it to re-produce the corresponding output feature map in the original network. We denote the <span><span class="MathJax_Preview">q</span><script type="math/tex">q</script></span>-th layer's reconstruction loss as <span><span class="MathJax_Preview">L_{q}^{( R )}</span><script type="math/tex">L_{q}^{( R )}</script></span>.</p>
 <p>Based on a pre-trained model, the DCP algorithm performs channel pruning with <span><span class="MathJax_Preview">\left( P + 1 \right)</span><script type="math/tex">\left( P + 1 \right)</script></span> stages. During the <span><span class="MathJax_Preview">p</span><script type="math/tex">p</script></span>-th stage, the network is fine-tuned with the <span><span class="MathJax_Preview">p</span><script type="math/tex">p</script></span>-th discrimination-aware loss <span><span class="MathJax_Preview">L_{p}</span><script type="math/tex">L_{p}</script></span> plus the final loss <span><span class="MathJax_Preview">L</span><script type="math/tex">L</script></span>. After the block-wise fine-tuning, we sequentially perform channel pruning for each convolutional layer within the block. For channel pruning, we compute each input channel's gradients <em>w.r.t.</em> the reconstruction loss <span><span class="MathJax_Preview">L_{q}^{( R )}</span><script type="math/tex">L_{q}^{( R )}</script></span> plus the discrimination-aware loss <span><span class="MathJax_Preview">L_{p}</span><script type="math/tex">L_{p}</script></span>, and remove the input channel with the minimal Frobenius norm of gradients. After that, this layer is fine-tuned with the remaining input channels only to (partially) recover the discriminative power. We repeat this process until the target pruning ratio is reached.</p>
@@ -287,7 +287,6 @@
 <pre><code class="bash"># set the number of channel pruning stages to 4
 ./scripts/run_docker.sh nets/resnet_at_ilsvrc12_run.py -n=4 \
     --learner dis-chn-pruned \
-    --data_disk docker \
     --resnet_size 34 \
     --dcp_nb_stages 4
 </code></pre>
@@ -296,7 +295,6 @@
 <pre><code class="bash"># enable training with distillation loss
 ./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py -n=8 \
     --learner dis-chn-pruned \
-    --data_disk seven \
     --mobilenet_version 2 \
     --enbl_dst
 </code></pre>

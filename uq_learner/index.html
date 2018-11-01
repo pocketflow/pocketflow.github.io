@@ -534,7 +534,7 @@ python export_pb_tflite_models.py \
 <h2 id="algorithms">Algorithms</h2>
 <p>Now we introduce the detailed algorithm in the Uniform Quantization Learner. As is shown in the following graph, given a full precision model, the Uniform Quantization Learner inserts quantization nodes into the computation graph of the model. To enable activation quantization, the quantization nodes shall also be inserted after the activation function.
 In the training phase, both full-precision and quantized weights are stored. During the forward pass, quantized weights are obtained by applying the quantization functions on the full precision weights. For the backward propagation of gradients, since the gradients w.r.t. the quantized weights are 0 almost everywhere, we use the straight-through estimator (STE) (<a href="https://www.coursera.org/learn/neural-networks">Hinton et.al 2012</a>, <a href="https://arxiv.org/abs/1308.3432">Bengio et.al 2013</a>) to pass the gradient of quantized weights directly to the full precision weights for update.</p>
-<p><img alt="Alt text" src="../train_inference.png" /></p>
+<p><img alt="Train_n_Inference" src="../pics/train_n_inference.png" /></p>
 <h3 id="uniform-quantization-function">Uniform Quantization Function</h3>
 <p>Uniform quantization distributed the quantization points evenly across the distribution of weights, and the full precision numbers are then assigned to the closest quantization point. To achieve this, we first normalize the full precision weights <span><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span> of one layer to  <span><span class="MathJax_Preview">[0, 1]</span><script type="math/tex">[0, 1]</script></span>, i.e.,
 $$

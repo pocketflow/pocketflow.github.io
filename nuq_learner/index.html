@@ -426,8 +426,8 @@ sh ./scripts/run_local.sh nets/mobilnet_at_ilsvrc12_run.py \
 $$
 \frac{\partial \mathcal{L}}{\partial c_k} = \sum_{i,j}\frac{\partial\mathcal{L}}{\partial w_{ij}}\frac{\partial{w_{ij}}}{\partial c_k}=\sum_{ij}\frac{\partial\mathcal{L}}{\partial{w_{ij}}}1(I_{ij}=k)
 $$</p>
-<p>The following figure taken from <a href="https://arxiv.org/abs/1510.00149">Han et.al 2015</a> shows the process of updating the clusters:
-<img alt="" src="../1539834279663.png" /></p>
+<p>The following figure taken from <a href="https://arxiv.org/abs/1510.00149">Han et.al 2015</a> shows the process of updating the clusters:</p>
+<p><img alt="Deep Compression Algor" src="../pics/deep_compression_algor.png" /></p>
 <h3 id="initialization-of-quantization-points">Initialization of quantization points</h3>
 <p>Aside from optimizing the quantization points, another helpful strategy is to properly initialize the quantization points according to the distribution of weights. PocketFlow currently supports two kinds of initialization: uniform initialization and quantile initialization. Comparing to uniform initialization, quantile initialization uses the quantiles of weights as the initial locations of quantization points. Quantile initialization considers the distribution of weights and can usually lead to better performance.</p>
 <h2 id="references">References</h2>

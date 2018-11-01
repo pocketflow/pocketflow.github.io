@@ -219,7 +219,7 @@ In order to maximally exploit the parameter redundancy of each layer, we need to
 </div>
 <p>where <span><span class="MathJax_Preview">\left| \mathbf{W}_{t} \right|</span><script type="math/tex">\left| \mathbf{W}_{t} \right|</script></span> denotes the number of parameters in the weight tensor <span><span class="MathJax_Preview">\mathbf{W}_{t}</span><script type="math/tex">\mathbf{W}_{t}</script></span> and <span><span class="MathJax_Preview">b</span><script type="math/tex">b</script></span> is the whole network's target quantization bit-width.</p>
 <p>Below, we present the overall workflow of adopting reinforcement learning, or more specifically, the DDPG algorithm (Lillicrap et al., 2016) to search for the optimal combination of layer-wise quantization bit-width:</p>
-<p><img alt="RL Workflow" src="../rl_workflow.png" /></p>
+<p><img alt="RL Workflow" src="../pics/rl_workflow.png" /></p>
 <p>To start with, we initialize an DDPG agent and set the best reward <span><span class="MathJax_Preview">r_{best}</span><script type="math/tex">r_{best}</script></span> to negative infinity to track the optimal combination of layer-wise quantization bit-width.
 The search process consists of multiple roll-outs.
 In each roll-out, we sequentially traverse each layer in the network to determine its quantization bit-width.

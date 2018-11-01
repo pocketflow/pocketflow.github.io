@@ -189,6 +189,91 @@
               
                 <h1 id="performance">Performance</h1>
 <p>Under construction ...</p>
+<p>We adopt <code>WeightSparseLearner</code> to introduce the sparsity constraint so that a large portion of model weights can be removed, which leads to smaller model and lower FLOPs for inference. Comparing with the original algorithm proposed in (Zhu &amp; Gupta, 2017), <code>WeightSparseLearner</code> further incorporates network distillation and reinforcement learning algorithms to improve the compressed model's accuracy, as demonstrated in the table below (top-1 accuracy is reported):</p>
+<table>
+<thead>
+<tr>
+<th align="center">Model</th>
+<th align="center">Sparsity</th>
+<th align="center">(Zhu &amp; Gupta, 2017)</th>
+<th align="center"><code>WeightSparseLearner</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">0%</td>
+<td align="center">70.6%</td>
+<td align="center">-</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">50%</td>
+<td align="center">69.5%</td>
+<td align="center">70.5% (+1.0%)</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">75%</td>
+<td align="center">67.7%</td>
+<td align="center">68.5% (+0.8%)</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">90%</td>
+<td align="center">61.8%</td>
+<td align="center">63.4% (+1.6%)</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">95%</td>
+<td align="center">53.6%</td>
+<td align="center">56.8% (+3.2%)</td>
+</tr>
+</tbody>
+</table>
+<p>We adopt <code>UniformQuantTFLearner</code> to uniformly quantize model weights from 32-bit floating-point numbers to 8-bit fixed-point numbers.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Model</th>
+<th align="center">Top-1 Acc. (32-bit)</th>
+<th align="center">Top-5 Acc. (32-bit)</th>
+<th align="center">Top-1 Acc. (8-bit)</th>
+<th align="center">Top-5 Acc. (8-bit)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">70.28%</td>
+<td align="center">89.38%</td>
+<td align="center">70.31% (+0.03%)</td>
+<td align="center">89.40% (+0.02%)</td>
+</tr>
+<tr>
+<td align="center">ResNet-50</td>
+<td align="center">75.97%</td>
+<td align="center">92.88%</td>
+<td align="center">76.01% (+0.04%)</td>
+<td align="center">92.87% (-0.01%)</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">70.89%</td>
+<td align="center">89.56%</td>
+<td align="center">71.29% (+0.40%)</td>
+<td align="center">89.79% (+0.23%)</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v2</td>
+<td align="center">71.84%</td>
+<td align="center">90.60%</td>
+<td align="center">72.26% (+0.42%)</td>
+<td align="center">90.77% (+0.17%)</td>
+</tr>
+</tbody>
+</table>
               
             </div>
           </div>
