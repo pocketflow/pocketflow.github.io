@@ -234,23 +234,17 @@ After obtaining the optimal pruning ratios, group fine-tuning is adopted to furt
 </tbody>
 </table>
 <p>We adopt <code>WeightSparseLearner</code> to introduce the sparsity constraint so that a large portion of model weights can be removed, which leads to smaller model and lower FLOPs for inference.
-Comparing with the original algorithm proposed in (Zhu &amp; Gupta, 2017), we also incorporate network distillation and reinforcement learning algorithms to further improve the compressed model's accuracy, as shown in the table below (top-1 accuracy is reported):</p>
+Comparing with the original algorithm proposed in (Zhu &amp; Gupta, 2017), we also incorporate network distillation and reinforcement learning algorithms to further improve the compressed model's accuracy, as shown in the table below:</p>
 <table>
 <thead>
 <tr>
 <th align="center">Model</th>
 <th align="center">Sparsity</th>
 <th align="center">(Zhu &amp; Gupta, 2017)</th>
-<th align="center">RL-based + Distillation</th>
+<th align="center">RL-based</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td align="center">MobileNet-v1</td>
-<td align="center">0%</td>
-<td align="center">70.6%</td>
-<td align="center">-</td>
-</tr>
 <tr>
 <td align="center">MobileNet-v1</td>
 <td align="center">50%</td>
