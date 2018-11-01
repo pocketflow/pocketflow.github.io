@@ -189,7 +189,8 @@
               
                 <h1 id="performance">Performance</h1>
 <p>Under construction ...</p>
-<p>We adopt <code>WeightSparseLearner</code> to introduce the sparsity constraint so that a large portion of model weights can be removed, which leads to smaller model and lower FLOPs for inference. Comparing with the original algorithm proposed in (Zhu &amp; Gupta, 2017), <code>WeightSparseLearner</code> further incorporates network distillation and reinforcement learning algorithms to improve the compressed model's accuracy, as demonstrated in the table below (top-1 accuracy is reported):</p>
+<p>We adopt <code>WeightSparseLearner</code> to introduce the sparsity constraint so that a large portion of model weights can be removed, which leads to smaller model and lower FLOPs for inference.
+Comparing with the original algorithm proposed in (Zhu &amp; Gupta, 2017), <code>WeightSparseLearner</code> incorporates network distillation and reinforcement learning algorithms to further improve the compressed model's accuracy, as shown in the table below (top-1 accuracy is reported):</p>
 <table>
 <thead>
 <tr>
@@ -232,7 +233,9 @@
 </tr>
 </tbody>
 </table>
-<p>We adopt <code>UniformQuantTFLearner</code> to uniformly quantize model weights from 32-bit floating-point numbers to 8-bit fixed-point numbers.</p>
+<p>We adopt <code>UniformQuantTFLearner</code> to uniformly quantize model weights from 32-bit floating-point numbers to 8-bit fixed-point numbers.
+The resulting model can be converted into the TensorFlow Lite format for deployment on mobile devices.
+In the following two tables, we show that 8-bit quantized models can be as accurate as (or even better than) the original 32-bit ones, and the inference time can be significantly reduced after quantization.</p>
 <table>
 <thead>
 <tr>
@@ -271,6 +274,68 @@
 <td align="center">90.60%</td>
 <td align="center">72.26% (+0.42%)</td>
 <td align="center">90.77% (+0.17%)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th align="center">Model</th>
+<th align="center">Hardware</th>
+<th align="center">CPU</th>
+<th align="center">Time (ms, 32-bit)</th>
+<th align="center">Time (ms, 8-bit)</th>
+<th align="center">Speed-up</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">XiaoMi 8 SE</td>
+<td align="center">Snapdragon 710</td>
+<td align="center">156.33</td>
+<td align="center">62.60</td>
+<td align="center">2.50 <span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span></td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">XiaoMI 8</td>
+<td align="center">Snapdragon 845</td>
+<td align="center">124.53</td>
+<td align="center">56.12</td>
+<td align="center">2.22 <span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span></td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">Huawei P20</td>
+<td align="center">Kirin 970</td>
+<td align="center">152.54</td>
+<td align="center">68.43</td>
+<td align="center">2.23 <span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span></td>
+</tr>
+<tr>
+<td align="center">MobileNet-v2</td>
+<td align="center">XiaoMi 8 SE</td>
+<td align="center">Snapdragon 710</td>
+<td align="center">153.18</td>
+<td align="center">57.55</td>
+<td align="center">2.50 <span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span></td>
+</tr>
+<tr>
+<td align="center">MobileNet-v2</td>
+<td align="center">XiaoMi 8</td>
+<td align="center">Snapdragon 845</td>
+<td align="center">120.59</td>
+<td align="center">49.04</td>
+<td align="center">2.22 <span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span></td>
+</tr>
+<tr>
+<td align="center">MobileNet-v2</td>
+<td align="center">Huawei P20</td>
+<td align="center">Kirin 970</td>
+<td align="center">226.61</td>
+<td align="center">61.38</td>
+<td align="center">2.23 <span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span></td>
 </tr>
 </tbody>
 </table>
