@@ -221,7 +221,7 @@ validation-00127-of-00128
 </code></pre>
 
 <h2 id="prepare-the-pre-trained-model">Prepare the Pre-trained Model</h2>
-<p>The discrimination-aware channel pruning algorithm requires a pre-trained uncompressed model provided in advance, so that a channel-pruned model can be trained with warm-start. You can download a pre-trained model from <a href="https://1drv.ms/f/s!Ahwjm8lejJYNuoZQgI3XJBPyIBQ1OQ">here</a>, and then unzip files into the <code>models</code> sub-directory.</p>
+<p>The discrimination-aware channel pruning algorithm requires a pre-trained uncompressed model provided in advance, so that a channel-pruned model can be trained with warm-start. You can download a pre-trained model from <a href="https://api.ai.tencent.com/pocketflow/list.html">here</a>, and then unzip files into the <code>models</code> sub-directory.</p>
 <p>Alternatively, you can train an uncompressed full-precision model from scratch using <code>FullPrecLearner</code> with the following command (choose whatever mode that fits you):</p>
 <pre><code class="bash"># local mode with 1 GPU
 $ ./scripts/run_local.sh nets/resnet_at_ilsvrc12_run.py

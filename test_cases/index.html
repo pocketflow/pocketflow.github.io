@@ -147,17 +147,17 @@
     
         <ul>
         
-            <li><a class="toctree-l4" href="#fp-full-precision">FP: Full-Precision</a></li>
+            <li><a class="toctree-l4" href="#full-precision">Full-Precision</a></li>
         
-            <li><a class="toctree-l4" href="#cp-channel-pruning">CP: Channel Pruning</a></li>
+            <li><a class="toctree-l4" href="#channel-pruning">Channel Pruning</a></li>
         
-            <li><a class="toctree-l4" href="#dcp-discrimination-aware-channel-pruning">DCP: Discrimination-aware Channel Pruning</a></li>
+            <li><a class="toctree-l4" href="#discrimination-aware-channel-pruning">Discrimination-aware Channel Pruning</a></li>
         
-            <li><a class="toctree-l4" href="#ws-weight-sparsification">WS: Weight Sparsification</a></li>
+            <li><a class="toctree-l4" href="#weight-sparsification">Weight Sparsification</a></li>
         
-            <li><a class="toctree-l4" href="#uq-uniform-quantization">UQ: Uniform Quantization</a></li>
+            <li><a class="toctree-l4" href="#uniform-quantization">Uniform Quantization</a></li>
         
-            <li><a class="toctree-l4" href="#nuq-non-uniform-quantization">NUQ: Non-uniform Quantization</a></li>
+            <li><a class="toctree-l4" href="#non-uniform-quantization">Non-uniform Quantization</a></li>
         
         </ul>
     
@@ -209,7 +209,7 @@
               
                 <h1 id="test-cases">Test Cases</h1>
 <p>This document contains various test cases to cover different combinations of learners and hyper-parameter settings. Any merge request to the master branch should be able to pass all the test cases to be approved.</p>
-<h2 id="fp-full-precision">FP: Full-Precision</h2>
+<h2 id="full-precision">Full-Precision</h2>
 <pre><code class="bash"># local mode
 $ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py
 $ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
@@ -239,7 +239,7 @@ $ ./scripts/run_docker.sh nets/resnet_at_cifar10_run.py \
     --enbl_dst
 </code></pre>
 
-<h2 id="cp-channel-pruning">CP: Channel Pruning</h2>
+<h2 id="channel-pruning">Channel Pruning</h2>
 <pre><code class="bash"># uniform preserve ratios for all layers
 $ ./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
     --learner channel \
@@ -253,7 +253,7 @@ $ ./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
     --cp_preserve_ratio 0.3
 </code></pre>
 
-<h2 id="dcp-discrimination-aware-channel-pruning">DCP: Discrimination-aware Channel Pruning</h2>
+<h2 id="discrimination-aware-channel-pruning">Discrimination-aware Channel Pruning</h2>
 <pre><code class="bash"># no network distillation
 $ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
     --learner dis-chn-pruned \
@@ -267,7 +267,7 @@ $ ./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py \
     --dcp_nb_stages 4
 </code></pre>
 
-<h2 id="ws-weight-sparsification">WS: Weight Sparsification</h2>
+<h2 id="weight-sparsification">Weight Sparsification</h2>
 <pre><code class="bash"># uniform pruning ratios for all layers
 $ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
     --learner weight-sparse \
@@ -291,7 +291,7 @@ $ ./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py \
     --ws_prune_ratio_prtl optimal
 </code></pre>
 
-<h2 id="uq-uniform-quantization">UQ: Uniform Quantization</h2>
+<h2 id="uniform-quantization">Uniform Quantization</h2>
 <pre><code class="bash"># channel-based bucketing
 $ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
     --learner uniform \
@@ -321,7 +321,7 @@ $ ./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py -n=2 \
     --uql_bucket_type split
 </code></pre>
 
-<h2 id="nuq-non-uniform-quantization">NUQ: Non-uniform Quantization</h2>
+<h2 id="non-uniform-quantization">Non-uniform Quantization</h2>
 <pre><code class="bash"># channel-based bucketing + RL + optimize clusters
 $ ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
     --learner non-uniform \
