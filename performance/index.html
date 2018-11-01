@@ -188,7 +188,7 @@
             <div class="section">
               
                 <h1 id="performance">Performance</h1>
-<p>In this documentation, we present some of our results for applying various model compression methods for ResNet and MobileNet models on the ImageNet classification task, including channel pruning, weight sparsification, and uniform quantization.</p>
+<p>In this documentation, we present evaluation results for applying various model compression methods for ResNet and MobileNet models on the ImageNet classification task, including channel pruning, weight sparsification, and uniform quantization.</p>
 <p>We adopt <code>ChannelPrunedLearner</code> to shrink the number of channels for convolutional layers to reduce the computation complexity.
 Instead of using the same pruning ratio for all layers, we utilize the DDPG algorithm as the RL agent to iteratively search for the optimal pruning ratio of each layer.
 After obtaining the optimal pruning ratios, group fine-tuning is adopted to further improve the compressed model's accuracy, as demonstrated below:</p>
@@ -363,7 +363,7 @@ In the following two tables, we show that 8-bit quantized models can be as accur
 <td align="center">Snapdragon 710</td>
 <td align="center">153.18</td>
 <td align="center">57.55</td>
-<td align="center">2.50<span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span></td>
+<td align="center">2.66<span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span></td>
 </tr>
 <tr>
 <td align="center">MobileNet-v2</td>
@@ -371,7 +371,7 @@ In the following two tables, we show that 8-bit quantized models can be as accur
 <td align="center">Snapdragon 845</td>
 <td align="center">120.59</td>
 <td align="center">49.04</td>
-<td align="center">2.22<span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span></td>
+<td align="center">2.46<span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span></td>
 </tr>
 <tr>
 <td align="center">MobileNet-v2</td>
@@ -379,7 +379,7 @@ In the following two tables, we show that 8-bit quantized models can be as accur
 <td align="center">Kirin 970</td>
 <td align="center">226.61</td>
 <td align="center">61.38</td>
-<td align="center">2.23<span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span></td>
+<td align="center">3.69<span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span></td>
 </tr>
 </tbody>
 </table>

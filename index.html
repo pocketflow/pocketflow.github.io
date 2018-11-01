@@ -59,6 +59,12 @@
         
             <li><a class="toctree-l3" href="#framework">Framework</a></li>
         
+            <li><a class="toctree-l3" href="#learners">Learners</a></li>
+        
+            <li><a class="toctree-l3" href="#hyper-parameter-optimizers">Hyper-parameter Optimizers</a></li>
+        
+            <li><a class="toctree-l3" href="#performance">Performance</a></li>
+        
         </ul>
     
 
@@ -199,7 +205,7 @@
 <h2 id="framework">Framework</h2>
 <p>The proposed framework mainly consists of two categories of algorithm components, <em>i.e.</em> learners and hyper-parameter optimizers, as depicted in the figure below. Given an uncompressed original model, the learner module generates a candidate compressed model using some randomly chosen hyper-parameter combination. The candidate model's accuracy and computation efficiency is then evaluated and used by hyper-parameter optimizer module as the feedback signal to determine the next hyper-parameter combination to be explored by the learner module. After a few iterations, the best one of all the candidate models is output as the final compressed model.</p>
 <p><img alt="Framework Design" src="pics/framework_design.png" /></p>
-<h3 id="learners">Learners</h3>
+<h2 id="learners">Learners</h2>
 <p>A learner refers to some model compression algorithm augmented with several training techniques as shown in the figure above. Below is a list of model compression algorithms supported in PocketFlow:</p>
 <table>
 <thead>
@@ -237,9 +243,132 @@
 </table>
 <p>All the above model compression algorithms can trained with fast fine-tuning, which is to directly derive a compressed model from the original one by applying either pruning masks or quantization functions. The resulting model can be fine-tuned with a few iterations to recover the accuracy to some extent. Alternatively, the compressed model can be re-trained with the full training data, which leads to higher accuracy but usually takes longer to complete.</p>
 <p>To further reduce the compressed model's performance degradation, we adopt network distillation to augment its training process with an extra loss term, using the original uncompressed model's outputs as soft labels. Additionally, multi-GPU distributed training is enabled for all learners to speed-up the time-consuming training process.</p>
-<h3 id="hyper-parameter-optimizers">Hyper-parameter Optimizers</h3>
+<h2 id="hyper-parameter-optimizers">Hyper-parameter Optimizers</h2>
 <p>For model compression algorithms, there are several hyper-parameters that may have a large impact on the final compressed model's performance. It can be quite difficult to manually determine proper values for these hyper-parameters, especially for developers that are not very familiar with algorithm details. Recently, several AutoML systems, <em>e.g.</em> <a href="https://cloud.google.com/automl/">Cloud AutoML</a> from Google, have been developed to train high-quality machine learning models with minimal human effort. Particularly, the AMC algorithm (He et al., 2018) presents promising results for adopting reinforcement learning for automated model compression with channel pruning and fine-grained pruning.</p>
 <p>In PocketFlow, we introduce the hyper-parameter optimizer module to iteratively search for the optimal hyper-parameter setting. We provide several implementations of hyper-parameter optimizer, based on models including Gaussian Processes (GP, Mockus, 1975), Tree-structured Parzen Estimator (TPE, Bergstra et al., 2013), and Deterministic Deep Policy Gradients (DDPG, Lillicrap et al., 2016). The hyper-parameter setting is optimized through an iterative process. In each iteration, the hyper-parameter optimizer chooses a combination of hyper-parameter values, and the learner generates a candidate model with fast fast-tuning. The candidate model is evaluated to calculate the reward of the current hyper-parameter setting. After that, the hyper-parameter optimizer updates its model to improve its estimation on the hyper-parameter space. Finally, when the best candidate model (and corresponding hyper-parameter setting) is selected after some iterations, this model can be re-trained with full data to further reduce the performance loss.</p>
+<h2 id="performance">Performance</h2>
+<p>In this section, we present some of our results for applying various model compression methods for ResNet and MobileNet models on the ImageNet classification task, including channel pruning, weight sparsification, and uniform quantization.
+For complete evaluation results, please refer to <a href="https://pocketflow.github.io/performance/">here</a>.</p>
+<h3 id="channel-pruning">Channel Pruning</h3>
+<p>We adopt the DDPG algorithm as the RL agent to find the optimal layer-wise pruning ratios, and use group fine-tuning to further improve the compressed model's accuracy:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Model</th>
+<th align="center">Pruning Ratio</th>
+<th align="center">Uniform</th>
+<th align="center">RL-based</th>
+<th align="center">RL-based + Group Fine-tuning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">50%</td>
+<td align="center">66.5%</td>
+<td align="center">67.8% (+1.3%)</td>
+<td align="center">67.9% (+1.4%)</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">60%</td>
+<td align="center">66.2%</td>
+<td align="center">66.9% (+0.7%)</td>
+<td align="center">67.0% (+0.8%)</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">70%</td>
+<td align="center">64.4%</td>
+<td align="center">64.5% (+0.1%)</td>
+<td align="center">64.8% (+0.4%)</td>
+</tr>
+<tr>
+<td align="center">Mobilenet-v1</td>
+<td align="center">80%</td>
+<td align="center">61.4%</td>
+<td align="center">61.4% (+0.0%)</td>
+<td align="center">62.2% (+0.8%)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="weight-sparsification">Weight Sparsification</h3>
+<p>Comparing with the original algorithm (Zhu &amp; Gupta, 2017) which uses the same sparsity for all layers, we incorporate the DDPG algorithm to iteratively search for the optimal sparsity of each layer, which leads to the increased accuracy:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Model</th>
+<th align="center">Sparsity</th>
+<th align="center">(Zhu &amp; Gupta, 2017)</th>
+<th align="center">RL-based</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">0%</td>
+<td align="center">70.6%</td>
+<td align="center">-</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">50%</td>
+<td align="center">69.5%</td>
+<td align="center">70.5% (+1.0%)</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">75%</td>
+<td align="center">67.7%</td>
+<td align="center">68.5% (+0.8%)</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">90%</td>
+<td align="center">61.8%</td>
+<td align="center">63.4% (+1.6%)</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">95%</td>
+<td align="center">53.6%</td>
+<td align="center">56.8% (+3.2%)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="uniform-quantization">Uniform Quantization</h3>
+<p>We show that models with 32-bit floating-point number weights can be safely quantized into their 8-bit counterpart without accuracy loss (sometimes even better!).
+The resulting model can be deployed on mobile devices for faster inference (Device: XiaoMi 8 with a Snapdragon 845 CPU):</p>
+<table>
+<thead>
+<tr>
+<th align="center">Model</th>
+<th align="center">Acc. (32-bit)</th>
+<th align="center">Acc. (8-bit)</th>
+<th align="center">Time (32-bit)</th>
+<th align="center">Time (8-bit)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">MobileNet-v1</td>
+<td align="center">70.89%</td>
+<td align="center">71.29% (+0.40%)</td>
+<td align="center">124.53</td>
+<td align="center">56.12 (2.22<span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span>)</td>
+</tr>
+<tr>
+<td align="center">MobileNet-v2</td>
+<td align="center">71.84%</td>
+<td align="center">72.26% (+0.42%)</td>
+<td align="center">120.59</td>
+<td align="center">49.04 (2.46<span><span class="MathJax_Preview">\times</span><script type="math/tex">\times</script></span>)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>All the reported time are in milliseconds.</li>
+</ul>
               
             </div>
           </div>
@@ -290,5 +419,5 @@
 
 <!--
 MkDocs version : 1.0.4
-Build Date UTC : 2018-11-01 06:24:10
+Build Date UTC : 2018-11-01 07:03:55
 -->
