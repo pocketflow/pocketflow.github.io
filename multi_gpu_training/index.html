@@ -205,7 +205,7 @@ In PocketFlow, we adopt multi-GPU training to speed-up this time-consuming train
 Our implementation is compatible with:</p>
 <ul>
 <li><a href="https://github.com/uber/horovod">Horovod</a>: a distributed training framework for TensorFlow, Keras, and PyTorch.</li>
-<li><a href="http://git.code.oa.com/ml/tfplus-doc-examples">TF-Plus</a>: an optimized framework for TensorFlow-based distributed training (only available within Tencent).</li>
+TF-Plus: an optimized framework for TensorFlow-based distributed training (only available within Tencent).</li>
 </ul>
 <p>We have provide a wrapper class, <code>MultiGpuWrapper</code>, to seamlessly switch between the above two frameworks.
 It will sequentially check whether Horovod and TF-Plus can be used, and use the first available one as the underlying framework for multi-GPU training.</p>
