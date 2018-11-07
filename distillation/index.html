@@ -99,11 +99,11 @@
     <a class="current" href="./">Distillation</a>
     <ul class="subnav">
             
-    <li class="toctree-l3"><a href="#knowledge-distilation">Knowledge Distilation</a></li>
+    <li class="toctree-l3"><a href="#distillation">Distillation</a></li>
     
         <ul>
         
-            <li><a class="toctree-l4" href="#compression-with-other-model-compression-approaches">Compression with Other Model Compression Approaches</a></li>
+            <li><a class="toctree-l4" href="#combination-with-other-model-compression-approaches">Combination with Other Model Compression Approaches</a></li>
         
         </ul>
     
@@ -197,23 +197,36 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="knowledge-distilation">Knowledge Distilation</h1>
-<p>wledge Distillation
-Knowledge Distillation is a kind of model compression approach in which a pre-trained large model teaches a smaller model to achieve the similar prediction capacity. It often named 'teacher-student' training, where the large model is the teacher and the smaller model is the student. The implementation used in PocketFlow is based on <a href="https://nervanasystems.github.io/distiller/knowledge_distillation/index.html#hinton-et-al-2015">Hinton et al., 2015</a>. </p>
-<p>With distillation, knowledge can be transferred from the teacher model to the student by minimizing a loss function where the target is the distribution of class probabilities predicted by the teacher model. In most situations, the probability of the correct class predicted by the teacher model is very high, and the probabilities of other classes are closed to 0, which may provide very limited information beyond the ground truth labels. We can use the class probabilities produced by the cumbersome model as "soft targets" for training the small model. The solution is to raise the temperature of the final softmax until the cumbersome model produces a suitably soft set of targets.  The probability <span><span class="MathJax_Preview">q_i</span><script type="math/tex">q_i</script></span> of class <span><span class="MathJax_Preview">i</span><script type="math/tex">i</script></span> is calculated from the logits <span><span class="MathJax_Preview">z_i</span><script type="math/tex">z_i</script></span>:</p>
+                <h1 id="distillation">Distillation</h1>
+<p>Distillation (Hinton et al., 2015) is a kind of model compression approaches in which a pre-trained large model teaches a smaller model to achieve the similar prediction performance.
+It is often named as the "teacher-student" training, where the large model is the teacher and the smaller model is the student.</p>
+<p>With distillation, knowledge can be transferred from the teacher model to the student by minimizing a loss function to recover the distribution of class probabilities predicted by the teacher model.
+In most situations, the probability of the correct class predicted by the teacher model is very high, and probabilities of other classes are close to 0, which may not be able to provide extra information beyond ground-truth labels.
+To overcome this issue, a commonly-used solution is to raise the temperature of the final softmax function until the cumbersome model produces a suitably soft set of targets. The soften probability <span><span class="MathJax_Preview">q_i</span><script type="math/tex">q_i</script></span> of class <span><span class="MathJax_Preview">i</span><script type="math/tex">i</script></span> is calculated from the logit <span><span class="MathJax_Preview">z_i</span><script type="math/tex">z_i</script></span>:</p>
 <div>
-<div class="MathJax_Preview">q_i = \frac{exp(z_i / T)}{\sum_j{exp(z_j/T)}}</div>
-<script type="math/tex; mode=display">q_i = \frac{exp(z_i / T)}{\sum_j{exp(z_j/T)}}</script>
+<div class="MathJax_Preview">
+q_i = \frac{\exp \left( z_i / T \right)}{\sum_j{\exp \left( z_j / T \right)}}
 </div>
-<p>where <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span> is the temperature. As <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span> grows, the probability distribution is more softer, providing more information as to which classes the cumbersome model more similar to the predicted class. It is better to include the standard loss (<span><span class="MathJax_Preview">T=1</span><script type="math/tex">T=1</script></span>) between the predicted class probabilities and the ground-truth labels.  The overall loss function is:</p>
+<script type="math/tex; mode=display">
+q_i = \frac{\exp \left( z_i / T \right)}{\sum_j{\exp \left( z_j / T \right)}}
+</script>
+</div>
+<p>where <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span> is the temperature.
+As <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span> grows, the probability distribution is more smooth, providing more information as to which classes the cumbersome model more similar to the predicted class.
+It is better to include the standard loss (<span><span class="MathJax_Preview">T = 1</span><script type="math/tex">T = 1</script></span>) between the predicted class probabilities and ground-truth labels.
+The overall loss function is given by:</p>
 <div>
-<div class="MathJax_Preview">L(x;W)=H(y,\sigma(z_s;T=1))+\alpha*H(\sigma(z_t;T=\tau),\sigma(z_s,T=\tau))</div>
-<script type="math/tex; mode=display">L(x;W)=H(y,\sigma(z_s;T=1))+\alpha*H(\sigma(z_t;T=\tau),\sigma(z_s,T=\tau))</script>
+<div class="MathJax_Preview">
+L \left( x; W \right) = H \left( y, \sigma \left( z_s; T = 1 \right) \right) + \alpha \cdot H \left( \sigma \left( z_t; T = \tau \right), \sigma \left( z_s, T = \tau \right) \right)
 </div>
-<p>where <span><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span> is the input, <span><span class="MathJax_Preview">W</span><script type="math/tex">W</script></span> are parameters of the distilled small model and <span><span class="MathJax_Preview">y</span><script type="math/tex">y</script></span> is the ground truth label,  <span><span class="MathJax_Preview">\sigma</span><script type="math/tex">\sigma</script></span> is the softmax parameterized by temperature <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span>, <span><span class="MathJax_Preview">H</span><script type="math/tex">H</script></span> is the cross entropy loss. <span><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> is the coefficient of the distillation loss. User can set <span><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> by <code>loss_w_dst</code> and set temperature <span><span class="MathJax_Preview">\tau</span><script type="math/tex">\tau</script></span> by <code>--tempr_dst</code>. </p>
-<h3 id="compression-with-other-model-compression-approaches">Compression with Other Model Compression Approaches</h3>
-<p>For other model model compression techniques such as channel pruning, weight pruning and quantization can be combined with the knowledge distilling. To use it, just enable it by setting <code>--enbl_dst=True</code>.</p>
-<p>[1] Hinton, G., Vinyals, O. and Dean, J., 2015. Distilling the knowledge in a neural network. <em>arXiv preprint arXiv:1503.02531</em>.</p>
+<script type="math/tex; mode=display">
+L \left( x; W \right) = H \left( y, \sigma \left( z_s; T = 1 \right) \right) + \alpha \cdot H \left( \sigma \left( z_t; T = \tau \right), \sigma \left( z_s, T = \tau \right) \right)
+</script>
+</div>
+<p>where <span><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span> is the input, <span><span class="MathJax_Preview">W</span><script type="math/tex">W</script></span> are parameters of the distilled small model and <span><span class="MathJax_Preview">y</span><script type="math/tex">y</script></span> is ground-truth labels, <span><span class="MathJax_Preview">\sigma</span><script type="math/tex">\sigma</script></span> is the softmax parameterized by temperature <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span>, <span><span class="MathJax_Preview">H</span><script type="math/tex">H</script></span> is the cross-entropy loss, and <span><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> is the coefficient of distillation loss.
+The coefficient <span><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> can be set by <code>--loss_w_dst</code> and the temperature <span><span class="MathJax_Preview">T</span><script type="math/tex">T</script></span> can be set by <code>--tempr_dst</code>.</p>
+<h2 id="combination-with-other-model-compression-approaches">Combination with Other Model Compression Approaches</h2>
+<p>Other model model compression techniques, such as channel pruning, weight pruning, and quantization, can be augmented with distillation. To enable the distillation loss, simply append the <code>--enbl_dst</code> argument when starting the program.</p>
               
             </div>
           </div>
