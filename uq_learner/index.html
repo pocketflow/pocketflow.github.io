@@ -88,11 +88,13 @@
     
         <ul>
         
-            <li><a class="toctree-l4" href="#uniform-quantization-learner">Uniform Quantization Learner</a></li>
+            <li><a class="toctree-l4" href="#introduction">Introduction</a></li>
         
-            <li><a class="toctree-l4" href="#tensorflow-quantization-wrapper">TensorFlow Quantization Wrapper</a></li>
+            <li><a class="toctree-l4" href="#algorithm">Algorithm</a></li>
         
-            <li><a class="toctree-l4" href="#algorithms">Algorithms</a></li>
+            <li><a class="toctree-l4" href="#1-uniformquantlearner">1. UniformQuantLearner</a></li>
+        
+            <li><a class="toctree-l4" href="#2-uniformquanttflearner">2. UniformQuantTFLearner</a></li>
         
             <li><a class="toctree-l4" href="#references">References</a></li>
         
@@ -204,14 +206,15 @@
             <div class="section">
               
                 <h1 id="uniform-quantization">Uniform Quantization</h1>
-<p>This document describes how to set up uniform quantization with PocketFlow. Uniform quantization is widely used for model compression and acceleration. Originally the weights in the network are represented by 32-bit float numbers. With uniform quantization, low-precision  (e.g., 4 bit, 8 bit) and evenly distributed float numbers are used to approximate the full precision networks. For 8 bit quantization, the network size can be reduced by 4 folds with little drop of performance.</p>
-<p>Currently PocketFlow supports two types of uniform quantization:</p>
+<h2 id="introduction">Introduction</h2>
+<p>Uniform quantization is widely used for model compression and acceleration. Originally the weights in the network are represented by 32-bit float numbers. With uniform quantization, low-precision  (e.g., 4 bit, 8 bit) and evenly distributed float numbers are used to approximate the full precision networks. For <span><span class="MathJax_Preview">k</span><script type="math/tex">k</script></span>-bit quantization, the memory saving can be up to <span><span class="MathJax_Preview">32/k</span><script type="math/tex">32/k</script></span>. For example, 8 bit quantization reduce the network size by 4 folds with little drop of performance.</p>
+<p>Currently PocketFlow supports two types of uniform quantization learner:</p>
 <ul>
 <li>
-<p>Uniform Quantization Learner: the self-developed learner. Aside from uniform quantization, the learner is carefully optimized with various extensions supported. The detailed algorithm of the Uniform Quantized Learner will be introduced at the end of the algorithm. The algorithm details are presented at the end of the document.</p>
+<p><code>UniformQuantLearner</code>: the self-developed learner for uniform quantization. The learner is carefully optimized with various extensions and variations supported.</p>
 </li>
 <li>
-<p>TensorFlow Quantization Wrapper:  a wrapper based on the <a href="https://www.tensorflow.org/performance/post_training_quantization">post training quantization</a> in TensorFlow. The wrapper currently only supports 8-bit quantization, enjoying 4x reduction of memory and nearly 4x times speed up of inference.</p>
+<p><code>UniformQuantTFLearner</code>:  a wrapper based on the <a href="https://github.com/tensorflow/tensorflow/tree/master/tensorflow/contrib/quantize">quantization aware training</a> in TensorFlow. The wrapper currently only supports 8-bit quantization, enjoying 4x reduction of memory and approximately 3x times speed up of inference.</p>
 </li>
 </ul>
 <p>A comparison of the two learners are shown below:</p>
@@ -251,296 +254,17 @@
 </tr>
 </tbody>
 </table>
-<h2 id="uniform-quantization-learner">Uniform Quantization Learner</h2>
-<p>The uniform quantization learner supports both weight quantization and activation quantization, where users can manually set up the bits for quantization. The uniform quantization learner also supports bucketing, which leads to more fine-grained quantization and better performance. The users can also turn on the hyper parameter optimizer with reinforcement learning to search for the optimal bit allocation for the learner.</p>
-<h3 id="prepare-the-model">Prepare the Model</h3>
-<p>To quantize the network, users should first get the model prepared. Users can either use the pre-built models in PocketFlow, or develop their custom models according to <a href="???">TODO</a>.</p>
-<h3 id="configure-the-learner">Configure the Learner</h3>
-<p>To configure the learner, users can pass the options via the TensorFlow flag interface. The available options are as follows:</p>
-<table>
-<thead>
-<tr>
-<th align="left">Options</th>
-<th align="center">Default Value</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>--uql_weight_bits</code></td>
-<td align="center">4</td>
-<td align="left">the number of bits for weight</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_activation_bits</code></td>
-<td align="center">32</td>
-<td align="left">the number of bits for activation， by default it remains full precision</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_save_quant_mode_path</code></td>
-<td align="center"><em>TODO</em></td>
-<td align="left">the save path for quantized models</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_use_buckets</code></td>
-<td align="center">False</td>
-<td align="left">use bucketing or not</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_bucket_type</code></td>
-<td align="center">channel</td>
-<td align="left">two bucket type available: ['split', 'channel']</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_bucket_size</code></td>
-<td align="center">256</td>
-<td align="left">quantize the first and last layers of the network or not</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_enbl_rl_agent</code></td>
-<td align="center">False</td>
-<td align="left">enable reinforcement learning  to learn the optimal bit allocation or not</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_quantize_all_layers</code></td>
-<td align="center">False</td>
-<td align="left">quantize the first and last layers of the network or not</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_quant_epoch</code></td>
-<td align="center">60</td>
-<td align="left">the number of epochs for fine-tuning</td>
-</tr>
-</tbody>
-</table>
-<h3 id="examples">Examples</h3>
-<p>Once the model is built, the quantization can be easily triggered by directly passing the Uniform Quantization Learner in the command line as follows:</p>
-<pre><code class="bash"># quantize resnet-20 on CIFAR-10
-# you can also configure the
-sh ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
---data_disk local \
---data_dir_local ${PF_CIFAR10_LOCAL} \
---learner=uniform \
---uql_weight_bits=4 \
---uql_activation_bits=4 \
-
-# quantize the resnet-18 on ILSVRC-12
-sh ./scripts/run_local.sh nets/resnet_at_ilsvrc12_run.py \
---learner=uniform \
---data_disk local \
---data_dir_local ${PF_ILSVRC12_LOCAL} \
---uql_weight_bits=8 \
---uql_activation_bits=8 \
---uql_use_buckets=True \
---uql_bucket_type=channel
-</code></pre>
-
-<h3 id="configure-the-hyper-parameter-optimizer">Configure the Hyper Parameter Optimizer</h3>
-<p>Once the hyper parameter optimizer is turned on, i.e., <code>uql_enbl_rl_agent==True</code> , the reinforcement learning agents will search for the optimal allocation of bits to each layers.  Before the search, users are supposed set up the bit constraints via <code>--uql_evquivalent_bits</code>, so that the optimal bits searched by the RL agent will not exceed the bit number without RL agent.
-<em>For example, TODO</em></p>
-<p>Users can also configure other options in the RL agent, such as the number of roll-outs, the fine-tuning steps to get the reward, e.t.c.. Full list of options are listed as follows:</p>
-<table>
-<thead>
-<tr>
-<th align="left">Options</th>
-<th align="center">Default Value</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left"><code>--uql_evquivalent_bits</code></td>
-<td align="center">4</td>
-<td align="left">the number of re-allocated bits that is equivalent to uniform quantization without RL agent</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_nb_rlouts</code></td>
-<td align="center">200</td>
-<td align="left">the number of roll outs for training the RL agent</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_w_bit_min</code></td>
-<td align="center">2</td>
-<td align="left">the minimal number of bits for each layer</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_w_bit_max</code></td>
-<td align="center">8</td>
-<td align="left">the maximal number of bits for each layer</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_enbl_rl_global_tune</code></td>
-<td align="center">True</td>
-<td align="left">enable fine-tuning all layers of the network or not</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_enbl_rl_layerwise_tune</code></td>
-<td align="center">False</td>
-<td align="left">enable fine-tuning the network layer by layer or not</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_tune_layerwise_steps</code></td>
-<td align="center">100</td>
-<td align="left">the number of steps for layerwise fine-tuning</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_tune_global_steps</code></td>
-<td align="center">2000</td>
-<td align="left">the number of steps for global fine-tuning</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_tune_disp_steps</code></td>
-<td align="center">300</td>
-<td align="left">the display steps to show the fine-tuning progress</td>
-</tr>
-<tr>
-<td align="left"><code>--uql_enbl_random_layers</code></td>
-<td align="center">True</td>
-<td align="left">randomly permute the layers during RL agent training</td>
-</tr>
-</tbody>
-</table>
-<h3 id="examples_1">Examples</h3>
-<pre><code class="bash"># quantize mobilenet-v1 on ILSVRC-12
-sh ./scripts/run_local.sh nets/mobilnet_at_ilsvrc12_run.py \
---data_disk local \
---data_dir_local ${PF_CIFAR10_LOCAL} \
---learner=uniform \
---uql_enbl_rl_agent=True \
---uql_equivalent_bits=4 \
---uql_tune_global_steps=1200
-</code></pre>
-
-<h3 id="performance">Performance</h3>
-<p>Here we list some of the performance on Cifar-10 using the Uniform Quantization Learner and the built-in models in PocketFlow. The options not displayed remain the default values.</p>
-<table>
-<thead>
-<tr>
-<th align="center">Model</th>
-<th align="center">Weight Bit</th>
-<th align="center">Activation Bit</th>
-<th align="center">Acc</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">32</td>
-<td align="center">32</td>
-<td align="center">91.96</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">4</td>
-<td align="center">4</td>
-<td align="center">90.73</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">8</td>
-<td align="center">8</td>
-<td align="center">92.25</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th align="center">Model</th>
-<th align="center">Weight Bit</th>
-<th align="center">Bucketing</th>
-<th align="center">Acc</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">2</td>
-<td align="center">channel</td>
-<td align="center">89.67</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">4</td>
-<td align="center">channel</td>
-<td align="center">92.02</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">2</td>
-<td align="center">split</td>
-<td align="center">91.15</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">4</td>
-<td align="center">split</td>
-<td align="center">91.98</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th align="center">Model</th>
-<th align="center">Weight Bit</th>
-<th align="center">RL search</th>
-<th align="center">Acc</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">2</td>
-<td align="center">FALSE</td>
-<td align="center">86.17</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">4</td>
-<td align="center">FALSE</td>
-<td align="center">91.76</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">2</td>
-<td align="center">TRUE</td>
-<td align="center">90.30</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">4</td>
-<td align="center">TRUE</td>
-<td align="center">91.88</td>
-</tr>
-</tbody>
-</table>
-<h2 id="tensorflow-quantization-wrapper">TensorFlow Quantization Wrapper</h2>
-<p>PocketFlow wraps the post training quantization in Tensorflow, and include all the necessary steps to convert the model to the .tflite format, which can be deployed on Andriod devices. To run the wrapper, users only need to get the checkpoint files ready, and then run the script.</p>
-<h3 id="prepare-the-checkpoint-files">Prepare the Checkpoint Files</h3>
-<p>Generally in TensorFlow, the checkpoints of a model include three files: .data, .index, .meta. Users are also supposed to add the input and output to collections,  and configure the wrapper to acquire the corresponding collections. An example is as follows:</p>
-<p><em>TODO</em> add quantization to the conversion tools</p>
-<pre><code class="bash"># load the checkpoints in ./models, and read the collections of 'inputs' and 'outputs'
-python export_pb_tflite_models.py \
---model_dir ./models
---input_coll inputs
---output_coll outputs
---quantize True
-</code></pre>
-
-<p>If successfully transformed, the <code>.pb</code> and <code>.tflite</code> files will be saved in <code>./models</code>.</p>
-<h3 id="deploy-on-mobile-devices">Deploy on Mobile Devices</h3>
-<p><em>TODO</em></p>
-<h2 id="algorithms">Algorithms</h2>
-<p>Now we introduce the detailed algorithm in the Uniform Quantization Learner. As is shown in the following graph, given a full precision model, the Uniform Quantization Learner inserts quantization nodes into the computation graph of the model. To enable activation quantization, the quantization nodes shall also be inserted after the activation function.
-In the training phase, both full-precision and quantized weights are stored. During the forward pass, quantized weights are obtained by applying the quantization functions on the full precision weights. For the backward propagation of gradients, since the gradients w.r.t. the quantized weights are 0 almost everywhere, we use the straight-through estimator (STE) (<a href="https://www.coursera.org/learn/neural-networks">Hinton et.al 2012</a>, <a href="https://arxiv.org/abs/1308.3432">Bengio et.al 2013</a>) to pass the gradient of quantized weights directly to the full precision weights for update.</p>
-<p><img alt="Train_n_Inference" src="../pics/train_n_inference.png" /></p>
+<h2 id="algorithm">Algorithm</h2>
+<p>Both uniform quantization learners generally obey the following procedures:</p>
+<p>Given a pre-defined full precision model, the learners insert quantization nodes into the computation graph of the model. To enable activation quantization, quantization nodes will also be placed after the activation operations (e.g., ReLu).</p>
+<p>In the training phase, both full-precision and quantized weights are kept. In the forward pass, quantized weights are obtained by applying the quantization functions on the full precision weights. To update the weights in the backward pass, since the gradients w.r.t. the quantized weights are 0 almost everywhere, we use the straight-through estimator (STE) (<a href="https://www.coursera.org/learn/neural-networks">Hinton et.al 2012</a>, <a href="https://arxiv.org/abs/1308.3432">Bengio et.al 2013</a>) to pass the gradient of quantized weights directly to the full precision weights for update.</p>
+<p><img alt="Train_n_Inference" src="D:/OneDrive%20-%20The%20Chinese%20University%20of%20Hong%20Kong/Research/MyWorks/automc/doc/pocketflow-docs/docs/pics/train_n_inference.png" /></p>
 <h3 id="uniform-quantization-function">Uniform Quantization Function</h3>
-<p>Uniform quantization distributed the quantization points evenly across the distribution of weights, and the full precision numbers are then assigned to the closest quantization point. To achieve this, we first normalize the full precision weights <span><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span> of one layer to  <span><span class="MathJax_Preview">[0, 1]</span><script type="math/tex">[0, 1]</script></span>, i.e.,
+<p>Uniform quantization distribute the quantization points evenly across the range <span><span class="MathJax_Preview">[w_{min}, w_{max}]</span><script type="math/tex">[w_{min}, w_{max}]</script></span>, where <span><span class="MathJax_Preview">w_{max}, w_{min}</span><script type="math/tex">w_{max}, w_{min}</script></span> are the maximum and minimum value of weights in the layer/bucket. Then the original full precision weights are then assigned to the closest quantization point. To achieve this, we first normalize the full precision weights <span><span class="MathJax_Preview">x</span><script type="math/tex">x</script></span> of one layer to  <span><span class="MathJax_Preview">[0, 1]</span><script type="math/tex">[0, 1]</script></span>, i.e.,
 $$
 sc(x) = \frac{x-\beta}{\alpha},
 $$
-where <span><span class="MathJax_Preview">\alpha=\max{x}-\min{x}</span><script type="math/tex">\alpha=\max{x}-\min{x}</script></span> and  <span><span class="MathJax_Preview">\beta = \min{x}</span><script type="math/tex">\beta = \min{x}</script></span> are the scaling factors. Then we assign <span><span class="MathJax_Preview">sc(x)</span><script type="math/tex">sc(x)</script></span> to the discrete value by
+where <span><span class="MathJax_Preview">\alpha=w_{max}-w_{min}</span><script type="math/tex">\alpha=w_{max}-w_{min}</script></span> and  <span><span class="MathJax_Preview">\beta = w_{min}</span><script type="math/tex">\beta = w_{min}</script></span> are the scaling factors. Then we assign <span><span class="MathJax_Preview">sc(x)</span><script type="math/tex">sc(x)</script></span> to the discrete value by
 $$
 \hat{x}=\frac{1}{2^k-1}\mathrm{round}((2^k-1)\cdot sc(x)),
 $$
@@ -548,6 +272,251 @@ and finally we do the inverse linear transformation to recover the quantized wei
 $$
 Q(x)=\alpha\hat{x}+\beta.
 $$</p>
+<p>Next we introduce usages for the two uniform quantization learners.</p>
+<h2 id="1-uniformquantlearner">1. UniformQuantLearner</h2>
+<p><code>UniformQuantLearner</code> is the self-developed learner, which allows a number of customized configurations for uniform quantization. For example, the learner supports bucketing, leading to more fine-grained quantization and better performance. The learner also allows to allocate different bits across layers, in which users can turn on the hyper parameter optimizer with reinforcement learning to search for the optimal bit allocation for the quantization.</p>
+<h3 id="hyper-parameters">Hyper-parameters</h3>
+<p>To configure <code>UniformQuantLearner</code>, users can pass the options via the TensorFlow flag interface. The available options are as follows:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Options</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>uql_weight_bits</code></td>
+<td align="left">the number of bits for weights. Default: <code>4</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uql_activation_bits</code></td>
+<td align="left">the number of bits for activation. Default: <code>32.</code></td>
+</tr>
+<tr>
+<td align="left"><code>uql_save_quant_model_path</code></td>
+<td align="left">quantized model's save path. Default: <code>./uql_quant_models/model.ckpt</code></td>
+</tr>
+<tr>
+<td align="left"><code>uql_use_buckets</code></td>
+<td align="left">the switch to use bucketing. Default: <code>False.</code></td>
+</tr>
+<tr>
+<td align="left"><code>uql_bucket_type</code></td>
+<td align="left">two bucket type available: [<code>split</code>, <code>channel</code>]. Default: <code>channel.</code></td>
+</tr>
+<tr>
+<td align="left"><code>uql_bucket_size</code></td>
+<td align="left">the number of bucket size for bucket type <code>split</code>. Default: <code>256</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uql_quantize_all_layers</code></td>
+<td align="left">the switch to quantize first and last layers of network. Default: <code>False.</code></td>
+</tr>
+<tr>
+<td align="left"><code>uql_quant_epoch</code></td>
+<td align="left">the number of epochs for fine-tuning. Default: <code>60</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uql_enbl_rl_agent</code></td>
+<td align="left">the switch to enable RL to learn optimal bit strategy. Default:<code>False</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Here, we provide detailed description (and some analysis) for above hyper-parameters:</p>
+<ul>
+<li><code>uql_weight_bits</code>: The number of bits for weight quantization. Generally, 8 bit does not hurt the model performance while it can compress the model size by 4 folds. While 2 bit and 4 bit could lead to drop of performance on large datasets such as Imagenet.</li>
+<li><code>uql_activation_bits</code>: The number of bits for activation quantization. When both weights and activations are quantized, 8 bit does not lead to apparent drop of performance, and sometimes can even increase the classification accuracy, which is probably due to better generalization ability. Nevertheless, the performance will be more challenged when both weights and activations are quantized to lower bits, comparing to weight-only quantization.</li>
+<li><code>uql_save_quant_mode_path</code>: the path to save the quantized model. Quantization nodes  have already been inserted into the graph.</li>
+<li><code>uql_use_buckets</code>: the switch to turn on the bucket. With bucketing, weights are split into multiple pieces, while the <span><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> and <span><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span> are calculated individually for each piece. Therefore, turning on the bucketing can lead to more fine-grained quantization.</li>
+<li><code>uql_bucket_type</code>: the type of bucketing. Currently two types are supported: [<code>split</code>, <code>channel</code>]. <code>split</code> refers to that the weights of a layer are first concatenated into a long vector, and then cut it into pieces according to <code>uql_bucket_size</code>. The remaining last piece will be padded and taken as a new piece. After quantization of each piece, the vectors are then folded back to the original shape as the quantized weights. <code>channel</code> refers to that weights with shape <code>[k, k, cin, cout]</code> in a convolutional layer are cut into <code>cout</code> buckets, where each bucket has the size of <code>k * k * cin</code>. For weights with shape <code>[m, n]</code> in fully connected layers, they are cut into <code>n</code> buckets, each of size <code>m</code>. In practice, bucketing with type  <code>channel</code> can be calculated more efficiently comparing to type <code>split</code> since there are less buckets and less computation to iterate through all of them.</li>
+<li><code>uql_bucket_size</code>: the size of buckets when using bucket type <code>split</code>. Generally, smaller bucket size can lead to more fine grained quantization, while more storage are required since full precision statistics (<span><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> and <span><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span>) of each bucket need to be kept.</li>
+<li><code>uql_quantize_all_layers</code>: the switch to quantize the first and last layers. The first and last layers of the network are connected directly with the input and output, and are arguably more sensitive to quantization. Keeping them un-quantized can slightly increase the performance, nevertheless, if you want to accelerate the inference speed, all layers are supposed to be quantized.</li>
+<li><code>uql_quant_epoch</code>: the epochs for fine-tuning a quantized network.</li>
+<li><code>uql_enbl_rl_agent</code>: the switch to turn on the RL agent as hyper parameter optimizer. Details about the RL agent and its configurations are described below.</li>
+</ul>
+<h3 id="configure-the-rl-agent">Configure the RL Agent</h3>
+<p>Once the hyper parameter optimizer is turned on, i.e., <code>uql_enbl_rl_agent==True</code> , the RL agent will automatically search for the optimal bit allocation strategy for each layer.  In order to search efficiently, the agent need to be configured properly. While here we list all the configurable hyper parameters for the agent, users can just keep the default value for most parameters, while modify only a few of them if necessary.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Options</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>uql_evquivalent_bits</code></td>
+<td align="left">the number of re-allocated bits that is equivalent to uniform allocation of bits. Default: <code>4</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uql_nb_rlouts</code></td>
+<td align="left">the number of roll outs for training the RL agent. Default: <code>200</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uql_w_bit_min</code></td>
+<td align="left">the minimal number of bits for each layer. Default: <code>2</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uql_w_bit_max</code></td>
+<td align="left">the maximal number of bits for each layer. Default: <code>8</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uql_enbl_rl_global_tune</code></td>
+<td align="left">the switch to fine-tune all layers of the network. Default: <code>True</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uql_enbl_rl_layerwise_tune</code></td>
+<td align="left">the switch to fine-tune the network layer by layer. Default: <code>False</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uql_tune_layerwise_steps</code></td>
+<td align="left">the number of steps for layer-wise fine-tuning. Default: <code>300</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uql_tune_global_steps</code></td>
+<td align="left">the number of steps for global fine-tuning. Default: <code>2000</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uql_tune_disp_steps</code></td>
+<td align="left">the display steps to show the fine-tuning progress. Default: <code>100</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uql_enbl_random_layers</code></td>
+<td align="left">the switch to randomly permute layers during RL agent training. Default: <code>True</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Detailed description and usages for above hyper-parameters are listed below:</p>
+<ul>
+<li><code>uql_equivalent_bits</code>:  the total number of bits used in the optimal strategy will not exceed <span><span class="MathJax_Preview">n_{param}*</span><script type="math/tex">n_{param}*</script></span><code>uql_equivalent_bits</code> . For example, by setting <code>uql_equivalent_bits</code>=4, the RL agent will try to find the best quantization strategy with the same compression ratio to that each layer is quantized by 4 bits.</li>
+</ul>
+<p>The following parameters can be kept in default value in most cases. Users can also modify them when using their customized models if necessary.</p>
+<ul>
+<li><code>uql_nb_rlouts</code>: the number of roll-out for training the RL agent.  Generally we will use the first quarter of <code>uql_nb_rlouts</code> for collection of  the training buffer, and last three quarters for the training of the agent. The larger the <code>uql_nb_rlouts</code>, the slower the search for the hyper-parameter optimizer.</li>
+<li><code>uql_w_bit_min</code>: the minimum number of quantization bit for a layer. This is used to constrain the searching space and avoid extreme strategies that crash the entire performance of the compressed model.</li>
+<li><code>uql_w_bit_max</code>: the maximum number of quantization bit for a layer. This is used to constrain the searching space and avoid that one layer may use too much unnecessary bits.</li>
+<li><code>uql_enbl_rl_global_tune</code>: the switch to globally fine-tune the network in each roll-out, which is done by updating the full-precision weights for all layers via the STE estimator. The aim of the fine-tune is to obtain effective reward from the current strategy.</li>
+<li><code>uql_enbl_rl_layerwise_tune</code>: the switch to layer-wise fine-tune the network in each roll-out, which is done by minimizing the l2-norm between the quantized layer and full-precision layer.</li>
+<li><code>uql_tune_layerwise_steps</code>: the number of steps for layer-wise fine-tuning. Generally, the larger the value, the more precise the reward and thereon the better the strategy.</li>
+<li><code>uql_tune_global_steps</code>: the number of steps for global fine-tuning. Generally, the larger the value, the more precise the reward and thereon the better the strategy.</li>
+<li><code>uql_tune_disp_steps</code>: the intervals to display the global training process in each roll-out.</li>
+<li><code>uql_enbl_random_layers</code> : the switch to randomly permute layers of the network when searching the optimal strategy. This could be helpful since the bit budget used in previous layers may affect the searching space for following layers, while randomly shuffling all layers makes sure that all layers have equal probability of all strategies.</li>
+</ul>
+<h3 id="usage-examples">Usage Examples</h3>
+<p>In this section, we provide some usage examples to demonstrate how to use <code>UniformQuantLearner</code>under different execution modes and hyper-parameter combinations.</p>
+<p>To quantize the network, users should first get the model prepared. Users can either use the pre-built models in PocketFlow, or develop their customized nets following the model definition in PocketFlow (for example, <a href="https://github.com/Tencent/PocketFlow/blob/master/nets/resnet_at_cifar10.py">resnet_at_cifar10.py</a>). Once the model is built, the quantization can be easily triggered by directly  as follows:</p>
+<p>To quantize a ResNet-20 model for CIFAR-10 classification task with 4 bits in the local mode, use:</p>
+<pre><code class="bash"># quantize resnet-20 on CIFAR-10
+sh ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+--learner=uniform \
+--uql_weight_bits=4 \
+--uql_activation_bits=4 \
+</code></pre>
+
+<p>To quantize a ResNet-18 model for ILSVRC_12 classification task with 8 bits in the docker mode with 4 GPUs, and allow to use the channel-wise bucketing, use:</p>
+<pre><code class="bash"># quantize the resnet-18 on ILSVRC-12
+sh ./scripts/run_docker.sh nets/resnet_at_ilsvrc12_run.py \
+-n=4 \
+--learner=uniform \
+--uql_weight_bits=8 \
+--uql_activation_bits=8 \
+--uql_use_buckets=True \
+--uql_bucket_type=channel
+</code></pre>
+
+<p>To quantize a MobileNet-v1 model for ILSVRC_12 classification task with 4 bits in the seven mode with 8 GPUs, and allow the RL agent to search for the optimal bit strategy, use:</p>
+<pre><code class="bash"># quantize mobilenet-v1 on ILSVRC-12
+sh ./scripts/run_seven.sh nets/mobilnet_at_ilsvrc12_run.py \
+-n=8 \
+--learner=uniform \
+--uql_enbl_rl_agent=True \
+--uql_equivalent_bits=4 \
+</code></pre>
+
+<h2 id="2-uniformquanttflearner">2. UniformQuantTFLearner</h2>
+<p>PocketFlow also wraps the quantization aware training in TensorFlow. The quantized model can be directly exported to <code>.tflite</code> format via <a href="https://github.com/haolibai/PocketFlow/blob/master/tools/conversion/export_quant_tflite_model.py">export_quant_tflite_model.py</a> in PocketFlow, and then be easily deployed on Andriod devices.</p>
+<p>To configure <code>UniformQuantTFLearner</code>, the hyper-parameters are as follows:</p>
+<table>
+<thead>
+<tr>
+<th>Options</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>uqtf_save_path</code></td>
+<td>UQ-TF: model\'s save path. Default: <code>./models_uqtf/model.ckpt</code>.</td>
+</tr>
+<tr>
+<td><code>uqtf_save_path_eval</code></td>
+<td>UQ-TF: model\'s save path for evaluation. Default: <code>./models_uqtf_eval/model.ckpt</code>.</td>
+</tr>
+<tr>
+<td><code>uqtf_weight_bits</code></td>
+<td>UQ-TF: # of bits for weight quantization. Default: <code>8</code>.</td>
+</tr>
+<tr>
+<td><code>uqtf_activation_bits</code></td>
+<td>UQ-TF: # of bits for activation quantization. Default: <code>8</code>.</td>
+</tr>
+<tr>
+<td><code>uqtf_quant_delay</code></td>
+<td>UQ-TF: # of steps after which weights and activations are quantized. Default: <code>0</code>.</td>
+</tr>
+<tr>
+<td><code>uqtf_freeze_bn_delay</code></td>
+<td>UT-TF: # of steps after which moving mean and variance are frozen. Default: <code>None</code>.</td>
+</tr>
+<tr>
+<td><code>uqtf_lrn_rate_dcy</code></td>
+<td>UQ-TF: learning rate\'s decaying factor. Default: <code>1e-2</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Here, the detailed description (and some analysis) for some above hyper-parameters are listed as follows:</p>
+<ul>
+<li><code>uqtf_quant_delay</code>: The number of steps to start fine-tuning on the quantized network. Before the training step reaches <code>uqtf_quant_delay</code>, only full precision weights of the model are updated.</li>
+<li><code>uqtf_freeze_bn_delay</code>: The number of steps after which the moving mean and variance of batch normalization layers are frozen and used, instead of the batch statistics during training.</li>
+<li><code>uqtf_lrn_rate_dcy</code> : The decay of learning rate for the quantized model. Generally the quantized network needs smaller learning rate comparing to that for the full-precision model.</li>
+</ul>
+<h3 id="usage-examples_1">Usage Examples</h3>
+<p>To deploy a quantized network on Andriod devices, there are generally 3 steps:</p>
+<h4 id="quantize-the-pre-trained-network">Quantize the pre-trained network</h4>
+<p>To quantize a MobileNet-v1 model for ILSVRC_12 classification task with 8 bits in the seven mode, use:</p>
+<pre><code class="bash"># quantize MobileNet-v1 on ILSVRC_12
+sh ./scripts/run_seven.sh nets/mobilnet_at_ilsvrc12_run.py \
+-n=8 \
+--learner=uniform-tf \
+--uqtf_weight_bits=8 \
+--uqtf_activation_bits=8 \
+--uqtf_quant_delay=10000
+</code></pre>
+
+<h4 id="export-to-tflite-format">Export to .tflite format</h4>
+<pre><code class="bash"># load the checkpoints in ./models, and read the collections of 'inputs' and 'outputs'
+python export_quant_tflite_models.py \
+--model_dir ./models \
+--input_coll inputs \
+--output_coll outputs \
+--enbl_post_quant True
+</code></pre>
+
+<p>Note that we set <code>enbl_post_quant</code>to<code>True</code> to ensure all operations being quantized. On the one hand, some operations may not be successfully quantized via <a href="https://www.tensorflow.org/api_docs/python/tf/contrib/quantize/experimental_create_training_graph">tf.contrib.quantize.experimental_create_training_graph</a> in <code>UniformQuantTFLearner</code>,  post quantization can help remedy this, possibly at the cost of slight decrease of the quantized performance. On the other hand, users can directly export a quantized model to <code>.tflite</code> format without going through the <code>UniformQuantTFLearner</code>. This could be helpful when users want to quickly test the inference speed, or there is more tolerance for the performance of quantized model.</p>
+<p>If successfully transformed, the <code>.pb</code> and <code>.tflite</code> files will be saved in <code>./models</code>.</p>
+<h4 id="deploy-on-mobile-devices">Deploy on Mobile Devices</h4>
+<p>The Deployment of a quantized model is very similar to that of a full-precision model, as is shown in the <a href="https://pocketflow.github.io/tutorial/">tutorial page</a>. Specifically, users need to do the following modifications:</p>
+<ol>
+<li>In <a href="https://github.com/tensorflow/tensorflow/blob/r1.12/tensorflow/contrib/lite/java/demo/app/src/main/java/com/example/android/tflitecamerademo/ImageClassifierQuantizedMobileNet.java">ImageClassifierQuantizedMobileNet.java</a> L24: rename the class w.r.t. your model.</li>
+<li>In <a href="https://github.com/tensorflow/tensorflow/blob/r1.12/tensorflow/contrib/lite/java/demo/app/src/main/java/com/example/android/tflitecamerademo/ImageClassifierQuantizedMobileNet.java">ImageClassifierQuantizedMobileNet.java</a> L46: replace the model input "mobilenet_quant_v1_224.tflite" to your "*.tflite" file.</li>
+<li>
+<p>In <a href="https://github.com/tensorflow/tensorflow/blob/r1.12/tensorflow/contrib/lite/java/demo/app/src/main/java/com/example/android/tflitecamerademo/ImageClassifierQuantizedMobileNet.java">ImageClassifierQuantizedMobileNet.java</a> L51: replace the label file "labels_mobilenet_quant_v1_224.txt" to your label files.</p>
+</li>
+<li>
+<p>In <a href="https://github.com/tensorflow/tensorflow/blob/r1.10/tensorflow/contrib/lite/java/demo/app/src/main/java/com/example/android/tflitecamerademo/Camera2BasicFragment.java">Camera2BasicFragment.java</a> L332: change the name of the class accordingly.</p>
+</li>
+</ol>
 <h2 id="references">References</h2>
 <p>Bengio Y, Léonard N, Courville A. Estimating or propagating gradients through stochastic neurons for conditional computation. arXiv preprint <a href="https://arxiv.org/abs/1308.3432">arXiv:1308.3432, 2013</a></p>
 <p>Geoffrey Hinton, Nitish Srivastava, Kevin Swersky, Tijmen Tieleman and Abdelrahman Mohamed. Neural Networks for Machine Learning. <a href="https://www.coursera.org/learn/neural-networks">Coursera, video lectures, 2012</a></p>

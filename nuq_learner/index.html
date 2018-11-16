@@ -92,15 +92,11 @@
     
         <ul>
         
-            <li><a class="toctree-l4" href="#prepare-the-model">Prepare the Model</a></li>
-        
-            <li><a class="toctree-l4" href="#configure-the-learner">Configure the Learner</a></li>
-        
-            <li><a class="toctree-l4" href="#examples">Examples</a></li>
-        
-            <li><a class="toctree-l4" href="#performance">Performance</a></li>
-        
             <li><a class="toctree-l4" href="#algorithm">Algorithm</a></li>
+        
+            <li><a class="toctree-l4" href="#hyper-parameters">Hyper-parameters</a></li>
+        
+            <li><a class="toctree-l4" href="#usage-examples">Usage Examples</a></li>
         
             <li><a class="toctree-l4" href="#references">References</a></li>
         
@@ -208,228 +204,175 @@
             <div class="section">
               
                 <h1 id="non-uniform-quantization-learner">Non-Uniform Quantization Learner</h1>
-<p>This document describes how to set up the Non-Uniform Quantization Learner in PocketFlow. In non-uniform quantization, the quantization points are not distributed evenly, and can be optimized via the back-propagation of the network gradients.
-Consequently, with the same number of bits, non-uniform quantization is more expressive to approximate the original full-precision network comparing to uniform quantization.</p>
-<p>Following a similar pattern in the previous sections, we first show how to configure the Non-Uniform Quantization Learner, followed by the algorithms used in the learner.</p>
-<h3 id="prepare-the-model">Prepare the Model</h3>
-<p>Again, users should first get the model prepared. Users can either use the pre-built models in PocketFlow, or develop their custom models according to <a href="???">TODO</a>.</p>
-<h3 id="configure-the-learner">Configure the Learner</h3>
-<p>To configure the learner, users can pass the options via the TensorFlow flag interface. The available options are as follows:</p>
+<p>Non-uniform quantization is a generalization to uniform quantization. In non-uniform quantization, the quantization points are not distributed evenly, and can be optimized via the back-propagation of the network gradients. Consequently, with the same number of bits, non-uniform quantization is more expressive to approximate the original full-precision network comparing to uniform quantization. Nevertheless, the non-uniform quantized model cannot be accelerated directly based on current deep learning frameworks, since the low-precision multiplication requires the intervals among quantization points to be equal. Therefore, the <code>NonUniformQuantLearner</code> can only help better compress the model.</p>
+<h2 id="algorithm">Algorithm</h2>
+<p><code>NonUniformQuantLearner</code> adopts a similar training and evaluation procedure to the <code>UniformQuantLearner</code>. In the training process, the quantized weights are forwarded, while in the backward pass, full precision weights are updated via the STE estimator. The major difference from uniform quantization is that the locations of quantization points are not evenly distributed, but can be optimized and initialized differently. In the following, we introduce the scheme to the update and initialization of quantization points.</p>
+<h3 id="optimization-the-quantization-points">Optimization the quantization points</h3>
+<p>Unlike uniform quantization, non-uniform quantization can optimize the location of quantization points dynamically during the training of the network, and thereon leads to less quantization loss. The location of quantization points can be updated by summing the gradients of weights that fall into the point (<a href="https://arxiv.org/abs/1510.00149">Han et.al 2015</a>), i.e.:
+$$
+\frac{\partial \mathcal{L}}{\partial c_k} = \sum_{i,j}\frac{\partial\mathcal{L}}{\partial w_{ij}}\frac{\partial{w_{ij}}}{\partial c_k}=\sum_{ij}\frac{\partial\mathcal{L}}{\partial{w_{ij}}}1(I_{ij}=k)
+$$
+The following figure taken from <a href="https://arxiv.org/abs/1510.00149">Han et.al 2015</a> shows the above process of updating the clusters:</p>
+<p><img alt="Deep Compression Algor" src="D:/OneDrive%20-%20The%20Chinese%20University%20of%20Hong%20Kong/Research/MyWorks/automc/doc/pocketflow-docs/docs/pics/deep_compression_algor.png" /></p>
+<h3 id="initialization-of-quantization-points">Initialization of quantization points</h3>
+<p>Aside from optimizing the quantization points, another helpful strategy is to properly initialize the quantization points according to the distribution of weights. PocketFlow currently supports two kinds of initialization:</p>
+<ul>
+<li>Uniform initialization: The quantization points are initialized to be evenly distributed along the range <span><span class="MathJax_Preview">[w_{min}, w_{max}]</span><script type="math/tex">[w_{min}, w_{max}]</script></span> of that layer/bucket.</li>
+<li>Quantile initialization: The quantization points are initialized to be the quantiles of full-precision weights. Comparing to uniform initialization, quantile initialization can generally lead to better performance.</li>
+</ul>
+<h2 id="hyper-parameters">Hyper-parameters</h2>
+<p>To configure <code>NonUniformQuantLearner</code>, users can pass the options via the TensorFlow flag interface. The available options are as follows:</p>
 <table>
 <thead>
 <tr>
 <th align="left">Options</th>
-<th align="center">Default Value</th>
 <th align="left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>--nuql_opt_mode</code></td>
-<td align="center">weight</td>
-<td align="left">variables to optimize: ['weights', 'clusters', 'both']</td>
+<td align="left"><code>nuql_opt_mode</code></td>
+<td align="left">the fine-tuning mode: [<code>weights</code>, <code>clusters</code>, <code>both</code>]. Default: <code>weight</code></td>
 </tr>
 <tr>
-<td align="left"><code>--nuql_init_style</code></td>
-<td align="center">quantile</td>
-<td align="left">the initialization of quantization points: ['quantile', 'uniform']</td>
+<td align="left"><code>nuql_init_style</code></td>
+<td align="left">the initialization of quantization point: [<code>quantile</code>, <code>uniform</code>].  Default: <code>quantile</code>.</td>
 </tr>
 <tr>
-<td align="left"><code>--nuql_weight_bits</code></td>
-<td align="center">4</td>
-<td align="left">the number of bits for weight</td>
+<td align="left"><code>nuql_weight_bits</code></td>
+<td align="left">the number of bits for weight. Default: <code>4</code>.</td>
 </tr>
 <tr>
-<td align="left"><code>--nuql_activation_bits</code></td>
-<td align="center">32</td>
-<td align="left">the number of bits for activation， by default it remains full precision</td>
+<td align="left"><code>nuql_activation_bits</code></td>
+<td align="left">the number of bits for activation. Default: <code>32</code>.</td>
 </tr>
 <tr>
-<td align="left"><code>--nuql_save_quant_mode_path</code></td>
-<td align="center"><em>TODO</em></td>
-<td align="left">the save path for quantized models</td>
+<td align="left"><code>nuql_save_quant_mode_path</code></td>
+<td align="left">the save path for quantized models. Default: <code>./nuql_quant_models/model.ckpt</code></td>
 </tr>
 <tr>
-<td align="left"><code>--nuql_use_buckets</code></td>
-<td align="center">False</td>
-<td align="left">use bucketing or not</td>
+<td align="left"><code>nuql_use_buckets</code></td>
+<td align="left">the switch to quantize first and last layers of network. Default: <code>False</code>.</td>
 </tr>
 <tr>
-<td align="left"><code>--nuql_bucket_type</code></td>
-<td align="center">channel</td>
-<td align="left">two bucket type available: ['split', 'channel']</td>
+<td align="left"><code>nuql_bucket_type</code></td>
+<td align="left">two bucket type available: ['split', 'channel']. Default: <code>channel</code>.</td>
 </tr>
 <tr>
-<td align="left"><code>--nuql_bucket_size</code></td>
-<td align="center">256</td>
-<td align="left">quantize the first and last layers of the network or not</td>
+<td align="left"><code>nuql_bucket_size</code></td>
+<td align="left">the number of bucket size for bucket type 'split'. Default: `256.</td>
 </tr>
 <tr>
-<td align="left"><code>--nuql_enbl_rl_agent</code></td>
-<td align="center">False</td>
-<td align="left">enable reinforcement learning  to learn the optimal bit allocation or not</td>
+<td align="left"><code>nuql_enbl_rl_agent</code></td>
+<td align="left">the switch to enable RL to learn optimal bit strategy. Default:<code>False</code>.</td>
 </tr>
 <tr>
-<td align="left"><code>--nuql_quantize_all_layers</code></td>
-<td align="center">False</td>
-<td align="left">quantize the first and last layers of the network or not</td>
+<td align="left"><code>nuql_quantize_all_layers</code></td>
+<td align="left">the switch to quantize first and last layers of network. Default: <code>False</code>.</td>
 </tr>
 <tr>
-<td align="left"><code>--nuql_quant_epoch</code></td>
-<td align="center">60</td>
-<td align="left">the number of epochs for fine-tuning</td>
+<td align="left"><code>nuql_quant_epoch</code></td>
+<td align="left">the number of epochs for fine-tuning. Default: <code>60</code>.</td>
 </tr>
 </tbody>
 </table>
-<p>Note that since non-uniform quantization cannot be accelerated directly, by default we do not quantize the activations.</p>
-<h3 id="examples">Examples</h3>
-<p>Once the model is built, the Non-Uniform Quantization Learner can be easily triggered by passing the Uniform Quantization Learner in the command line as follows:</p>
+<p>Here, we provide detailed description (and some analysis) for some of the above hyper-parameters:</p>
+<ul>
+<li><code>nuql_opt_mode</code>: the mode for fine-tuning the non-uniformly quantized network, choose among  [<code>weights</code>, <code>clusters</code>, <code>both</code>]. <code>weight</code> refers to only updating the network weights, while <code>clusters</code> refers to only updating the quantization points, and <code>both</code> means updating weights and quantization points simultaneously. Experimentally, we found that <code>weight</code> and <code>both</code> achieve similar performance, both of which outperform <code>clusters</code>.</li>
+<li><code>nuql_init_style</code>: the style of initialization of quantization points, currently supports  [<code>quantile</code>, <code>uniform</code>]. The differences between the two strategies have been discussed earlier.</li>
+<li><code>nuql_weight_bits</code>: The number of bits for weight quantization. Generally, for lower bit quantization (e.g., 2 bit on CIFAR10 and 4 bit on ILSVRC_12), <code>NonUniformQuantLearner</code> performs much better than <code>UniformQuantLearner</code>. The gap becomes less when using higher bits.</li>
+<li><code>nuql_activation_bits</code>: The number of bits for activation quantization. Since non-uniform quantized models cannot be accelerated directly, by default we leave it as 32 bit.</li>
+<li><code>nuql_save_quant_mode_path</code>: the path to save the quantized model. Quantization nodes  have already been inserted into the graph.</li>
+<li><code>nuql_use_buckets</code>: the switch to turn on the bucket. With bucketing, weights are split into multiple pieces, while the <span><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> and <span><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span> are calculated individually for each piece. Therefore, turning on the bucketing can lead to more fine-grained quantization.</li>
+<li><code>nuql_bucket_type</code>: the type of bucketing. Currently two types are supported: [<code>split</code>, <code>channel</code>]. <code>split</code> refers to that the weights of a layer are first concatenated into a long vector, and then cut it into short pieces according to <code>uql_bucket_size</code>. The remaining last piece is still regarded as a new piece. After quantization for each piece, the vectors are then folded back to the original shape as the quantized weights. <code>channel</code> refers to that weights with shape <code>[k, k, cin, cout]</code> in a convolutional layer are cut into <code>cout</code> buckets, where each bucket has the size of <code>k * k * cin</code>. For weights with shape <code>[m, n]</code> in fully connected layers, they are cut into <code>n</code> buckets, each of size <code>m</code>. In practice, bucketing with type  <code>channel</code> can be calculated more quickly comparing to type <code>split</code> since there are less buckets and less computation to iterate through all buckets.</li>
+<li><code>nuql_bucket_size</code>: the size of buckets when using bucket type <code>split</code>. Generally, smaller bucket size can lead to more fine grained quantization, while more storage are required since full precision statistics (<span><span class="MathJax_Preview">\alpha</span><script type="math/tex">\alpha</script></span> and <span><span class="MathJax_Preview">\beta</span><script type="math/tex">\beta</script></span>) of each bucket need to be kept.</li>
+<li><code>nuql_quantize_all_layers</code>: the switch to quantize the first and last layers. The first and last layers of the network are connected directly with the input and output, and are arguably more sensitive to quantization. Keeping them un-quantized can slightly increase the performance, nevertheless, if you want to accelerate the inference speed, all layers are supposed to be quantized.</li>
+<li><code>nuql_quant_epoch</code>: the epochs for fine-tuning a quantized network.</li>
+<li><code>nuql_enbl_rl_agent</code>: the switch to turn on the RL agent as hyper parameter optimizer. Details about the RL agent and its configurations are described below.</li>
+</ul>
+<h3 id="configure-the-rl-agent">Configure the RL Agent</h3>
+<p>Similar to uniform quantization, once <code>nuql_enbl_rl_agent==True</code> , the RL agent will automatically search for the optimal bit allocation strategy for each layer.  In order to search efficiently, the agent need to be configured properly. While here we list all the configurable hyper parameters for the agent, users can just keep the default value for most parameters, while modify only a few of them if necessary.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Options</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>nuql_evquivalent_bits</code></td>
+<td align="left">the number of re-allocated bits that is equivalent to non-uniform quantization without RL agent. Default: <code>4</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>nuql_nb_rlouts</code></td>
+<td align="left">the number of roll outs for training the RL agent. Default: <code>200</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>nuql_w_bit_min</code></td>
+<td align="left">the minimal number of bits for each layer. Default: <code>2</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>nuql_w_bit_max</code></td>
+<td align="left">the maximal number of bits for each layer. Default: <code>8</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>nuql_enbl_rl_global_tune</code></td>
+<td align="left">the switch to fine-tune all layers of the network. Default: <code>True</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>nuql_enbl_rl_layerwise_tune</code></td>
+<td align="left">the switch to fine-tune the network layer by layer. Default: <code>False</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>nuql_tune_layerwise_steps</code></td>
+<td align="left">the number of steps for layer-wise fine-tuning. Default: <code>300</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>nuql_tune_global_steps</code></td>
+<td align="left">the number of steps for global fine-tuning. Default: <code>2000</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>nuql_tune_disp_steps</code></td>
+<td align="left">the display steps to show the fine-tuning progress. Default: <code>100</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>nuql_enbl_random_layers</code></td>
+<td align="left">the switch to randomly permute layers during RL agent training. Default: <code>True</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Detailed description can be found in <a href="https://pocketflow.github.io/uq_learner/">Uniform Quantization</a>, with the only difference that the prefix is changed to <code>nuql_</code>.</p>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>Again, users should first get the model prepared. Users  can either use the pre-built models in PocketFlow, or develop their customized nets following the model definition in PocketFlow (for example, <a href="https://github.com/Tencent/PocketFlow/blob/master/nets/resnet_at_cifar10.py">resnet_at_cifar10.py</a>) Once the model is built, the Non-Uniform Quantization Learner can be easily triggered  as follows:</p>
+<p>To quantize a ResNet-20 model for CIFAR-10 classification task with 4 bits in the local mode, use:</p>
 <pre><code class="bash"># quantize resnet-20 on CIFAR-10
-# you can also configure the
 sh ./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
---data_disk local \
---data_dir_local ${PF_CIFAR10_LOCAL} \
 --learner=non-uniform \
 --nuql_weight_bits=4 \
 --nuql_activation_bits=4 \
+</code></pre>
 
-# quantize the resnet-18 on ILSVRC-12
-sh ./scripts/run_local.sh nets/resnet_at_ilsvrc12_run.py \
---learner=uniform \
---data_disk local \
---data_dir_local ${PF_ILSVRC12_LOCAL} \
+<p>To quantize a ResNet-18 model for ILSVRC_12 classification task with 8 bits in the docker mode with 4 GPUs, and allow to use the channel-wise bucketing, use:</p>
+<pre><code class="bash"># quantize the resnet-18 on ILSVRC-12
+sh ./scripts/run_docker.sh nets/resnet_at_ilsvrc12_run.py \
+-n=4 \
+--learner=non-uniform \
 --nuql_weight_bits=8 \
 --nuql_activation_bits=8 \
 --nuql_use_buckets=True \
 --nuql_bucket_type=channel
 </code></pre>
 
-<p>To enable the RL agent, one can follow similar patterns as those in the Uniform Quantization Learner:</p>
+<p>To quantize a MobileNet-v1 model for ILSVRC_12 classification task with 4 bits in the seven mode with 8 GPUs, and allow the RL agent to search for the optimal bit strategy, use:</p>
 <pre><code class="bash"># quantize mobilenet-v1 on ILSVRC-12
-sh ./scripts/run_local.sh nets/mobilnet_at_ilsvrc12_run.py \
---data_disk local \
---data_dir_local ${PF_CIFAR10_LOCAL} \
---learner=uniform \
+sh ./scripts/run_seven.sh nets/mobilnet_at_ilsvrc12_run.py \
+-n=8 \
+--learner=non-uniform \
 --nuql_enbl_rl_agent=True \
 --nuql_equivalent_bits=4 \
---nuql_tune_global_steps=1200
 </code></pre>
 
-<h3 id="performance">Performance</h3>
-<p>Here we list some of the performance on Cifar-10 using the Non-Uniform Quantization Learner and the built-in models in PocketFlow. The options not displayed remain the default values.</p>
-<table>
-<thead>
-<tr>
-<th align="center">Model</th>
-<th align="center">Weight Bit</th>
-<th align="center">Activation Bit</th>
-<th align="center">Acc</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">32</td>
-<td align="center">32</td>
-<td align="center">91.96</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">2</td>
-<td align="center">4</td>
-<td align="center">90.31</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">4</td>
-<td align="center">8</td>
-<td align="center">91.70</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th align="center">Model</th>
-<th align="center">Weight Bit</th>
-<th align="center">Bucketing</th>
-<th align="center">Acc</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">2</td>
-<td align="center">channel</td>
-<td align="center">90.90</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">4</td>
-<td align="center">channel</td>
-<td align="center">91.97</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">2</td>
-<td align="center">split</td>
-<td align="center">90.02</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">4</td>
-<td align="center">split</td>
-<td align="center">91.56</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th align="center">Model</th>
-<th align="center">Weight Bit</th>
-<th align="center">RL search</th>
-<th align="center">Acc</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">2</td>
-<td align="center">FALSE</td>
-<td align="center">90.31</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">4</td>
-<td align="center">FALSE</td>
-<td align="center">91.70</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">2</td>
-<td align="center">TRUE</td>
-<td align="center">90.60</td>
-</tr>
-<tr>
-<td align="center">ResNet-20</td>
-<td align="center">4</td>
-<td align="center">TRUE</td>
-<td align="center">91.79</td>
-</tr>
-</tbody>
-</table>
-<h2 id="algorithm">Algorithm</h2>
-<p>Non-Uniform Quantization Learner adopts a similar training and evaluation procedure to the Uniform Quantization. In the training process, the quantized weights are forwarded. In the backward pass, the full precision weights are updated via the STE estimator. The major difference from uniform quantization is that, the location of quantization points are not evenly distributed, but can be optimized and initialized differently. In the following, we introduce the scheme to update and initialize the quantization points.</p>
-<h3 id="optimization-the-quantization-points">Optimization the quantization points</h3>
-<p>Unlike uniform quantization, non-uniform quantization can optimize the location of quantization points dynamically during the training of the network, and thereon leads to less quantization loss. The location of quantization points can be updated by summing the gradients of weights that fall into the point (<a href="https://arxiv.org/abs/1510.00149">Han et.al 2015</a>), i.e.,:
-$$
-\frac{\partial \mathcal{L}}{\partial c_k} = \sum_{i,j}\frac{\partial\mathcal{L}}{\partial w_{ij}}\frac{\partial{w_{ij}}}{\partial c_k}=\sum_{ij}\frac{\partial\mathcal{L}}{\partial{w_{ij}}}1(I_{ij}=k)
-$$</p>
-<p>The following figure taken from <a href="https://arxiv.org/abs/1510.00149">Han et.al 2015</a> shows the process of updating the clusters:</p>
-<p><img alt="Deep Compression Algor" src="../pics/deep_compression_algor.png" /></p>
-<h3 id="initialization-of-quantization-points">Initialization of quantization points</h3>
-<p>Aside from optimizing the quantization points, another helpful strategy is to properly initialize the quantization points according to the distribution of weights. PocketFlow currently supports two kinds of initialization: uniform initialization and quantile initialization. Comparing to uniform initialization, quantile initialization uses the quantiles of weights as the initial locations of quantization points. Quantile initialization considers the distribution of weights and can usually lead to better performance.</p>
 <h2 id="references">References</h2>
 <p>Han S, Mao H, and Dally W J. Deep compression: Compressing deep neural networks with pruning, trained quantization and huffman coding. <a href="https://arxiv.org/abs/1510.00149">arXiv:1510.00149, 2015</a></p>
               

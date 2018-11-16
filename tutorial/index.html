@@ -77,8 +77,6 @@
         
             <li><a class="toctree-l3" href="#deploy-on-mobile-devices">Deploy on Mobile Devices</a></li>
         
-            <li><a class="toctree-l3" href="#reference">Reference</a></li>
-        
         </ul>
     
 
@@ -206,12 +204,12 @@
                 <h1 id="tutorial">Tutorial</h1>
 <p>In this tutorial, we demonstrate how to compress a convolutional neural network and export the compressed model into a *.tflite file for deployment on mobile devices. The model we used here is a 18-layer residual network (denoted as "ResNet-18") trained for the ImageNet classification task. We will compress it with the discrimination-aware channel pruning algorithm (Zhuang et al., NIPS '18) to reduce the number of convolutional channels used in the network for speed-up.</p>
 <h2 id="prepare-the-data">Prepare the Data</h2>
-<p>To start with, we need to convert the ImageNet data set (ILSVRC-12) into TensorFlow's native TFRecord file format. You may follow the data preparation guide <a href="https://github.com/tensorflow/models/tree/master/research/inception#getting-started">here</a> to download the full data set and convert it into TFRecord files. After that, you should be able to find 4,096 training files and 128 validation files in the data directory, like this:</p>
+<p>To start with, we need to convert the ImageNet data set (ILSVRC-12) into TensorFlow's native TFRecord file format. You may follow the data preparation guide <a href="https://github.com/tensorflow/models/tree/master/research/inception#getting-started">here</a> to download the full data set and convert it into TFRecord files. After that, you should be able to find 1,024 training files and 128 validation files in the data directory, like this:</p>
 <pre><code class="bash"># training files
-train-00000-of-04096
-train-00001-of-04096
+train-00000-of-01024
+train-00001-of-01024
 ...
-train-04095-of-04096
+train-01023-of-01024
 
 # validation files
 validation-00000-of-00128
@@ -266,33 +264,33 @@ $ ./scripts/run_seven.sh nets/resnet_at_ilsvrc12_run.py -n=8 \
 </tr>
 <tr>
 <td align="left"><code>channel</code></td>
-<td align="left"><code>ChannelPruningLearner</code></td>
-<td align="left">Channel pruning [2]</td>
+<td align="left"><code>ChannelPrunedLearner</code></td>
+<td align="left">Channel pruning with LASSO-based channel selection (He et al., 2017)</td>
 </tr>
 <tr>
 <td align="left"><code>dis-chn-pruned</code></td>
 <td align="left"><code>DisChnPrunedLearner</code></td>
-<td align="left">Discrimination-aware channel pruning [1]</td>
+<td align="left">Discrimination-aware channel pruning (Zhuang et al., 2018)</td>
 </tr>
 <tr>
 <td align="left"><code>weight-sparse</code></td>
 <td align="left"><code>WeightSparseLearner</code></td>
-<td align="left">Weight sparsification [3]</td>
+<td align="left">Weight sparsification with dynamic pruning schedule (Zhu &amp; Gupta, 2017)</td>
 </tr>
 <tr>
 <td align="left"><code>uniform</code></td>
-<td align="left"><code>UniformQuantizedLearner</code></td>
-<td align="left">Uniform weight quantization []</td>
+<td align="left"><code>UniformQuantLearner</code></td>
+<td align="left">Weight quantization with uniform reconstruction levels (Jacob et al., 2018)</td>
 </tr>
 <tr>
-<td align="left"><code>tf-uniform</code></td>
-<td align="left"><code>UniformQuantizedLearnerTF</code></td>
-<td align="left">Uniform weight quantization in TensorFlow []</td>
+<td align="left"><code>uniform-tf</code></td>
+<td align="left"><code>UniformQuantTFLearner</code></td>
+<td align="left">Weight quantization with uniform reconstruction levels and TensorFlow APIs</td>
 </tr>
 <tr>
 <td align="left"><code>non-uniform</code></td>
-<td align="left"><code>NonUniformQuantizedLearner</code></td>
-<td align="left">Non-uniform weight quantization []</td>
+<td align="left"><code>NonUniformQuantLearner</code></td>
+<td align="left">Weight quantization with non-uniform reconstruction levels (Han et al., 2016)</td>
 </tr>
 </tbody>
 </table>
@@ -459,13 +457,6 @@ public void onActivityCreated(Bundle savedInstanceState) {
   startBackgroundThread();
 }
 </code></pre>
-
-<h2 id="reference">Reference</h2>
-<ul>
-<li>[1] Zhuangwei Zhuang, Mingkui Tan, Bohan Zhuang, Jing Liu, Jiezhang Cao, Qingyao Wu, Junzhou Huang, Jinhui Zhu, <em>Discrimination-aware Channel Pruning for Deep Neural Networks</em>, In Proc. of the Annual Conference on Neural Information Processing Systems (NIPS), 2018.</li>
-<li>[2] Yihui He, Xiangyu Zhang, Jian Sun, <em>Channel Pruning for Accelerating Very Deep Neural Networks</em>, In Proc. of the IEEE International Conference on Computer Vision (ICCV), 2017.</li>
-<li>[3] Michael Zhu, Suyog Gupta, <em>To Prune, or Not to Prune: Exploring the Efficacy of Pruning for Model Compression</em>, CoRR, abs/1710.01878, 2017.</li>
-</ul>
               
             </div>
           </div>
