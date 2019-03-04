@@ -93,6 +93,10 @@
                 </li>
                 <li class="">
                     
+    <a class="" href="../cpr_learner/">Channel Pruning - Remastered</a>
+                </li>
+                <li class="">
+                    
     <a class="" href="../dcp_learner/">Discrimination-aware Channel Pruning</a>
                 </li>
                 <li class="">
@@ -213,11 +217,11 @@
                 <h1 id="channel-pruning">Channel Pruning</h1>
 <h2 id="introduction">Introduction</h2>
 <p>Channel pruning is a kind of structural model compression approach which can not only compress the model size, but accelerate the inference speed directly. PocketFlow uses the channel pruning algorithm proposed in (He et al., 2017) to pruning each channel of convolution layers with a certain ratio, and for details please refer to the <a href="https://arxiv.org/abs/1707.06168">channel pruning paper</a>. For better performance and more robust, we modify some parts of the algorithm to achieve better result.</p>
-<p>In order to achieve a better performance, PocketFlow can take advantages of reinforcement learning to search a better compression ratio (He et al., 2018). User can also use the distilling (Hinton et al., 2015) and group tuning function to improve the accuracy after compression. Group tuning means setting a certain number of layers as group and then pruning and finetuning/retraining each group sequentially. For example we can set each 3 layers as a group and then pruning the first 3 layers. After that finetune/retraine the whole model and prune the next 3 layers and so on. Distilling and group tuning are experimentally proved as effective approaches to achieve higher accuracy at a certain compression ratio in most situations.</p>
+<p>In order to achieve a better performance, PocketFlow can take advantages of reinforcement learning to search a better compression ratio (He et al., 2018). User can also use the distilling (Hinton et al., 2015) and group tuning function to improve the accuracy after compression. Group tuning means setting a certain number of layers as group and then pruning and fine-tuning (or re-training) each group sequentially. For example, we can set each 3 layers as a group and then prune the first 3 layers. After that, we fine-tune (or re-train) the whole model and prune the next 3 layers and so on. Distilling and group tuning are experimentally proved as effective approaches to achieve higher accuracy at a certain compression ratio in most situations.</p>
 <h2 id="pruning-option">Pruning Option</h2>
 <p>The code of channel pruning are located at directory <code>./learners/channel_pruning</code>. To use channel pruning. users can set <code>--learners</code> to <code>channel</code>. The Channel pruning supports 3 kinds of pruning setup by <code>cp_prune_option</code> option.</p>
 <h3 id="uniform-channel-pruning">Uniform Channel Pruning</h3>
-<p>One is the uniform layer pruning, which means the user can set each convolution layer pruned with an uniform pruning ratio by  <code>--cp_prune_option=uniform</code> and set the ratio (eg. making the ratio 0.5) by <code>--cp_uniform_preserve_ratio=0.5</code>. Note that for a layer, if both of pruning ratio of the layer and its previous layer are 0.5, the real preserved FLOPs are 1/4 of original FLOPs. Because channel pruning only prune the c_out channels of the convolution and c_in channels of the next convolution, if both c_in and c_out channels are pruned by 0.5, it will preserve only 1/4 of original computation cost. For a layer by layer convolution networks without residual blocks, if the user set <code>cp_uniform_preserve_ratio</code> to <code>0.5</code>, the whole model will be the 0.25 computation of the original model. However for the residual networks, some convolutions can only prune their c_in or c_out channels, which means the total preseved computation ratio may be much greater than 0.25.</p>
+<p>One is the uniform layer pruning, which means the user can set each convolution layer pruned with an uniform pruning ratio by  <code>--cp_prune_option=uniform</code> and set the ratio (eg. making the ratio 0.5) by <code>--cp_uniform_preserve_ratio=0.5</code>. Note that for a layer, if both of pruning ratio of the layer and its previous layer are 0.5, the real preserved FLOPs are 1/4 of original FLOPs. Because channel pruning only prune the c_out channels of the convolution and c_in channels of the next convolution, if both c_in and c_out channels are pruned by 0.5, it will preserve only 1/4 of original computation cost. For a layer by layer convolution networks without residual blocks, if the user set <code>cp_uniform_preserve_ratio</code> to <code>0.5</code>, the whole model will be the 0.25 computation of the original model. However for the residual networks, some convolutions can only prune their c_in or c_out channels, which means the total preserved computation ratio may be much greater than 0.25.</p>
 <p><strong>Example:</strong></p>
 <pre><code class="bash">$ ./scripts/run_seven.sh nets/resnet_at_cifar10_run.py \
     --learner channel \
@@ -253,9 +257,9 @@ Add list <code>1.0, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 1.0,
 <h2 id="channel-pruning-parameters">Channel pruning parameters</h2>
 <p>The implementation of the channel pruning use Lasso algorithm to do channel selection and linear regression to do feature map reconstruction. During these two phases, sampling is done on the feature map to reduce computation cost. The users can use <code>--cp_nb_points_per_layer</code> to set how many sampling points on each layer are taken, the default value is <code>10</code>. For some dataset, if the images contain too many zero pixels (eg. black color), the value should be greater. The users can also set using how many batches to do channel selection and feature reconstruction by <code>cp_nb_batches</code>, the default value is <code>60</code>. Small value of  <code>cp_nb_batches</code> may cause over-fitting and large value may slow down the solving speed, so a good value depends on the nets and dataset. For more practical usage, user may consider make the channel number of each layer is the quadruple for fast inference of mobile devices. In this case, user can set <code>--cp_quadruple</code> to <code>True</code> to make the compressed model have a quadruple number of channels.</p>
 <h2 id="distilling">Distilling</h2>
-<p>Distilling is an effective approach to improve the final accuracy of compressed model with PocketFlow in most situations of classification. User can set <code>--enbl_dst=True</code> to enable distillling.</p>
+<p>Distilling is an effective approach to improve the final accuracy of compressed model with PocketFlow in most situations of classification. User can set <code>--enbl_dst=True</code> to enable distilling.</p>
 <h2 id="group-tuning">Group Tuning</h2>
-<p>As introduced above, group tuning was proposed by the PocketFlow team and finding it is very useful to improve the performance of model compression. In PocketFlow, users can set <code>--cp_finetune=True</code> to enable group finetuning and set the group number by <code>--cp_list_group</code>, the default value is <code>1000</code>. There is a trade-off between the small value and large value, because if the value is <code>1</code>, Pocketflow will prune convolution and finetune/retrain by each layer, which may have better effect but be more time-consuming. If we set the value large, the function will be less effective. User can also set the number of iterations to finetune by setting <code>cp_nb_iters_ft_ratio</code> which mean the ratio the total iterations to be used in finetuning. The learning rate of finetuning can be set by <code>cp_lrn_rate_ft</code>.</p>
+<p>As introduced above, group tuning was proposed by the PocketFlow team and finding it is very useful to improve the performance of model compression. In PocketFlow, users can set <code>--cp_finetune=True</code> to enable group fine-tuning and set the group number by <code>--cp_list_group</code>, the default value is <code>1000</code>. There is a trade-off between the small value and large value, because if the value is <code>1</code>, PocketFlow will prune convolution and fine-tune/re-train by each layer, which may have better effect but be more time-consuming. If we set the value large, the function will be less effective. User can also set the number of iterations to fine-tune by setting <code>cp_nb_iters_ft_ratio</code> which mean the ratio the total iterations to be used in fine-tuning. The learning rate of fine-tuning can be set by <code>cp_lrn_rate_ft</code>.</p>
               
             </div>
           </div>
@@ -263,7 +267,7 @@ Add list <code>1.0, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 1.0,
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../dcp_learner/" class="btn btn-neutral float-right" title="Discrimination-aware Channel Pruning">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../cpr_learner/" class="btn btn-neutral float-right" title="Channel Pruning - Remastered">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../tutorial/" class="btn btn-neutral" title="Tutorial"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -295,7 +299,7 @@ Add list <code>1.0, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 0.1875, 1.0,
         <span><a href="../tutorial/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../dcp_learner/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../cpr_learner/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

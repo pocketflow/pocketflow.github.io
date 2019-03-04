@@ -73,6 +73,10 @@
                 </li>
                 <li class="">
                     
+    <a class="" href="../cpr_learner/">Channel Pruning - Remastered</a>
+                </li>
+                <li class="">
+                    
     <a class="" href="../dcp_learner/">Discrimination-aware Channel Pruning</a>
                 </li>
                 <li class="">
@@ -379,7 +383,7 @@ from utils.multi_gpu_wrapper import MultiGpuWrapper as mgw
 
 FLAGS = tf.app.flags.FLAGS
 
-tf.app.flags.DEFINE_float('nb_epochs_rat', 1.0, '# of training epochs\'s ratio')
+tf.app.flags.DEFINE_float('nb_epochs_rat', 1.0, '# of training epochs\' ratio')
 tf.app.flags.DEFINE_float('lrn_rate_init', 1e-1, 'initial learning rate')
 tf.app.flags.DEFINE_float('batch_size_norm', 128, 'normalization factor of batch size')
 tf.app.flags.DEFINE_float('momentum', 0.9, 'momentum coefficient')
@@ -396,7 +400,7 @@ def forward_fn(inputs, data_format):
   * inputs: outputs from the network's forward pass
   &quot;&quot;&quot;
 
-  # tranpose the image tensor if needed
+  # transpose the image tensor if needed
   if data_format == 'channel_first':
     inputs = tf.transpose(inputs, [0, 3, 1, 2])
 
@@ -489,7 +493,7 @@ class ModelHelper(AbstractModelHelper):
     return 'fmnist'
 </code></pre>
 
-<p>In the <code>build_dataset_train</code> and <code>build_dataset_eval</code> functions, we adopt the previously introduced <code>FMnistDataset</code> class to define the data input pipeline. The network forward-pass computation is defined in the <code>forward_train</code> and <code>forward_eval</code> functions, which corresponds to the training and evaluation graph, respectivley. The training graph is slightly different from evaluation graph, such as operations related to the batch normalization layers. The <code>calc_loss</code> function calculates the loss function's value and extra evaluation metrics, <em>e.g.</em> classification accuracy. Finally, the <code>setup_lrn_rate</code> function defines the learning rate schedule, as well as how many training iterations are need.</p>
+<p>In the <code>build_dataset_train</code> and <code>build_dataset_eval</code> functions, we adopt the previously introduced <code>FMnistDataset</code> class to define the data input pipeline. The network forward-pass computation is defined in the <code>forward_train</code> and <code>forward_eval</code> functions, which corresponds to the training and evaluation graph, respectively. The training graph is slightly different from evaluation graph, such as operations related to the batch normalization layers. The <code>calc_loss</code> function calculates the loss function's value and extra evaluation metrics, <em>e.g.</em> classification accuracy. Finally, the <code>setup_lrn_rate</code> function defines the learning rate schedule, as well as how many training iterations are need.</p>
 <h3 id="execution-script">Execution Script</h3>
 <p>Besides the self-defined <code>ModelHelper</code> class, we still need an execution script to pass it to the corresponding model compression component to start the training process. Below is the full implementation (this should be placed under the "./nets" directory, named as "convnet_at_fmnist_run.py"):</p>
 <pre><code class="Python">import traceback

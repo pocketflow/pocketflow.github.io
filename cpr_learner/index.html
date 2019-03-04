@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Channel Pruning - Remastered - PocketFlow Docs</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Channel Pruning - Remastered";
+    var mkdocs_page_input_path = "cpr_learner.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> PocketFlow Docs</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../installation/">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../tutorial/">Tutorial</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Learners - Algorithms</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../cp_learner/">Channel Pruning</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Channel Pruning - Remastered</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#channel-pruning-remastered">Channel Pruning - Remastered</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#introduction">Introduction</a></li>
+        
+            <li><a class="toctree-l4" href="#algorithm-description">Algorithm Description</a></li>
+        
+            <li><a class="toctree-l4" href="#hyper-parameters">Hyper-parameters</a></li>
+        
+            <li><a class="toctree-l4" href="#empirical-evaluation">Empirical Evaluation</a></li>
+        
+            <li><a class="toctree-l4" href="#usage-examples">Usage Examples</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../dcp_learner/">Discrimination-aware Channel Pruning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../ws_learner/">Weight Sparsification</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../uq_learner/">Uniform Quantization</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../nuq_learner/">Non-uniform Quantization</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Learners - Misc.</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../distillation/">Distillation</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../multi_gpu_training/">Multi-GPU Training</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Hyper-parameter Optimizers</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../reinforcement_learning/">Reinforcement Learning</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../automl_based_methods/">AutoML-based Methods</a>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../self_defined_models/">Self-defined Models</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../performance/">Performance</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../faq/">Frequently Asked Questions</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Appendix</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../pre_trained_models/">Pre-trained Models</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../test_cases/">Test Cases</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../reference/">Reference</a>
+                </li>
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">PocketFlow Docs</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Learners - Algorithms &raquo;</li>
+        
+      
+    
+    <li>Channel Pruning - Remastered</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="channel-pruning-remastered">Channel Pruning - Remastered</h1>
+<h2 id="introduction">Introduction</h2>
+<p>Channel pruning (He et al., 2017) aims at reducing the number of input channels of each convolutional layer while minimizing the reconstruction loss of its output feature maps, using preserved input channels only. Similar to other model compression components based on channel pruning, this can lead to direct reduction in both model size and computational complexity (in terms of FLOPs).</p>
+<p>In PocketFlow, we provide <code>ChannelPrunedRmtLearner</code> as the remastered version of the previous <code>ChannelPrunedLearner</code>, with simplified and easier-to-understand implementation. The underlying algorithm is based on (He et al., 2017), with a few modifications. However, the support for RL-based hyper-parameter optimization is not yet ready and will be provided in the near future.</p>
+<h2 id="algorithm-description">Algorithm Description</h2>
+<p>For a convolutional layer, we denote its input feature map as <span><span class="MathJax_Preview">\mathcal{X} \in \mathbb{R}^{N \times h_{i} \times w_{i} \times c_{i}}</span><script type="math/tex">\mathcal{X} \in \mathbb{R}^{N \times h_{i} \times w_{i} \times c_{i}}</script></span>, where <span><span class="MathJax_Preview">N</span><script type="math/tex">N</script></span> is the batch size, <span><span class="MathJax_Preview">h_{i}</span><script type="math/tex">h_{i}</script></span> and <span><span class="MathJax_Preview">w_{i}</span><script type="math/tex">w_{i}</script></span> are the spatial height and width, and <span><span class="MathJax_Preview">c_{i}</span><script type="math/tex">c_{i}</script></span> is the number of inputs channels. The convolutional kernel is denoted as <span><span class="MathJax_Preview">\mathcal{W} \in \mathbb{R}^{k_{h} \times k_{w} \times c_{i} \times c_{o}}</span><script type="math/tex">\mathcal{W} \in \mathbb{R}^{k_{h} \times k_{w} \times c_{i} \times c_{o}}</script></span>, where <span><span class="MathJax_Preview">\left( k_{h}, k_{w} \right)</span><script type="math/tex">\left( k_{h}, k_{w} \right)</script></span> is the kernel's spatial size and <span><span class="MathJax_Preview">c_{o}</span><script type="math/tex">c_{o}</script></span> is the number of output channels. The resulting output feature map is given by <span><span class="MathJax_Preview">\mathcal{Y} = f \left( \mathcal{X}; \mathcal{W} \right) \in \mathbb{R}^{N \times h_{o} \times w_{o} \times c_{o}}</span><script type="math/tex">\mathcal{Y} = f \left( \mathcal{X}; \mathcal{W} \right) \in \mathbb{R}^{N \times h_{o} \times w_{o} \times c_{o}}</script></span>, where <span><span class="MathJax_Preview">h_{o}</span><script type="math/tex">h_{o}</script></span> and <span><span class="MathJax_Preview">w_{o}</span><script type="math/tex">w_{o}</script></span> are the spatial height and width, and <span><span class="MathJax_Preview">f \left( \cdot \right)</span><script type="math/tex">f \left( \cdot \right)</script></span> denotes the convolutional operation.</p>
+<p>The convolutional operation can be understood as standard matrix multiplication between two matrices, one from <span><span class="MathJax_Preview">\mathcal{X}</span><script type="math/tex">\mathcal{X}</script></span> and the other from <span><span class="MathJax_Preview">\mathcal{W}</span><script type="math/tex">\mathcal{W}</script></span>. The input feature map <span><span class="MathJax_Preview">\mathcal{X}</span><script type="math/tex">\mathcal{X}</script></span> is re-arranged via the <code>im2col</code> operator to produce a matrix <span><span class="MathJax_Preview">\mathbf{X}</span><script type="math/tex">\mathbf{X}</script></span> of size <span><span class="MathJax_Preview">N h_{o} w_{o} \times h_{k} w_{k} c_{i}</span><script type="math/tex">N h_{o} w_{o} \times h_{k} w_{k} c_{i}</script></span>. The convolutional kernel <span><span class="MathJax_Preview">\mathcal{W}</span><script type="math/tex">\mathcal{W}</script></span> is correspondingly reshaped into <span><span class="MathJax_Preview">\mathbf{W}</span><script type="math/tex">\mathbf{W}</script></span> of size <span><span class="MathJax_Preview">h_{k} w_{k} c_{i} \times c_{o}</span><script type="math/tex">h_{k} w_{k} c_{i} \times c_{o}</script></span>. The multiplication of these two matrices produces the output feature map in the matrix form, given by <span><span class="MathJax_Preview">\mathbf{Y} = \mathbf{X} \mathbf{W}</span><script type="math/tex">\mathbf{Y} = \mathbf{X} \mathbf{W}</script></span>, which can be further reshaped back to the 4-D tensor <span><span class="MathJax_Preview">\mathcal{Y}</span><script type="math/tex">\mathcal{Y}</script></span>.</p>
+<p>The matrix multiplication can be decomposed along the dimension of input channels. We divide <span><span class="MathJax_Preview">\mathbf{X}</span><script type="math/tex">\mathbf{X}</script></span> into <span><span class="MathJax_Preview">c_{i}</span><script type="math/tex">c_{i}</script></span> sub-matrices <span><span class="MathJax_Preview">\left\{ \mathbf{X}_{i} \right\}</span><script type="math/tex">\left\{ \mathbf{X}_{i} \right\}</script></span>, each of size <span><span class="MathJax_Preview">N h_{o} w_{o} \times h_{k} w_{k}</span><script type="math/tex">N h_{o} w_{o} \times h_{k} w_{k}</script></span>, and similarly divide <span><span class="MathJax_Preview">\mathbf{W}</span><script type="math/tex">\mathbf{W}</script></span> into <span><span class="MathJax_Preview">c_{i}</span><script type="math/tex">c_{i}</script></span> sub-matrices <span><span class="MathJax_Preview">\left\{ \mathbf{W}_{i} \right\}</span><script type="math/tex">\left\{ \mathbf{W}_{i} \right\}</script></span>, each of size <span><span class="MathJax_Preview">h_{k} w_{k} c_{i} \times c_{o}</span><script type="math/tex">h_{k} w_{k} c_{i} \times c_{o}</script></span>. The computation of output feature map <span><span class="MathJax_Preview">\mathbf{Y}</span><script type="math/tex">\mathbf{Y}</script></span> can be rewritten as:</p>
+<div>
+<div class="MathJax_Preview">
+\mathbf{Y} = \sum\nolimits_{i = 1}^{c_{i}} \mathbf{X}_{i} \mathbf{W}_{i}
+</div>
+<script type="math/tex; mode=display">
+\mathbf{Y} = \sum\nolimits_{i = 1}^{c_{i}} \mathbf{X}_{i} \mathbf{W}_{i}
+</script>
+</div>
+<p>In (He et al., 2017), a <span><span class="MathJax_Preview">c_{i}</span><script type="math/tex">c_{i}</script></span>-dimensional binary-valued mask vector <span><span class="MathJax_Preview">\boldsymbol{\beta}</span><script type="math/tex">\boldsymbol{\beta}</script></span> is introduced to indicate whether an input channel is pruned (<span><span class="MathJax_Preview">\beta_{i} = 0</span><script type="math/tex">\beta_{i} = 0</script></span>) or not (<span><span class="MathJax_Preview">\beta_{i} = 1</span><script type="math/tex">\beta_{i} = 1</script></span>). More formally, we consider the minimization of output feature map's reconstruction loss under sparsity constraint:</p>
+<div>
+<div class="MathJax_Preview">
+\min_{\mathbf{W}, \boldsymbol{\beta}} \left\| \mathbf{Y} - \sum\nolimits_{i = 1}^{c_{i}} \beta_{i} \mathbf{X}_{i} \mathbf{W}_{i} \right\|_{F}^{2}, ~ \text{s.t.} ~ \left\| \boldsymbol{\beta} \right\|_{0} \le c'_{i}
+</div>
+<script type="math/tex; mode=display">
+\min_{\mathbf{W}, \boldsymbol{\beta}} \left\| \mathbf{Y} - \sum\nolimits_{i = 1}^{c_{i}} \beta_{i} \mathbf{X}_{i} \mathbf{W}_{i} \right\|_{F}^{2}, ~ \text{s.t.} ~ \left\| \boldsymbol{\beta} \right\|_{0} \le c'_{i}
+</script>
+</div>
+<p>The above problem can be tackled by firstly solving <span><span class="MathJax_Preview">\boldsymbol{\beta}</span><script type="math/tex">\boldsymbol{\beta}</script></span> via a LASSO regression problem, and then updating <span><span class="MathJax_Preview">\mathbf{W}</span><script type="math/tex">\mathbf{W}</script></span> with the closed-form solution (or iterative solution) to least-square regression. Particularly, in the first step, we rewrite the sparsity constraint as a <span><span class="MathJax_Preview">l_{1}</span><script type="math/tex">l_{1}</script></span>-regularization term, so the optimization over <span><span class="MathJax_Preview">\boldsymbol{\beta}</span><script type="math/tex">\boldsymbol{\beta}</script></span> is now given by:</p>
+<div>
+<div class="MathJax_Preview">
+\min_{\boldsymbol{\beta}} \left\| \mathbf{Y} - \sum\nolimits_{i = 1}^{c_{i}} \beta_{i} \mathbf{X}_{i} \mathbf{W}_{i} \right\|_{F}^{2} + \lambda \left\| \boldsymbol{\beta} \right\|_{1}
+</div>
+<script type="math/tex; mode=display">
+\min_{\boldsymbol{\beta}} \left\| \mathbf{Y} - \sum\nolimits_{i = 1}^{c_{i}} \beta_{i} \mathbf{X}_{i} \mathbf{W}_{i} \right\|_{F}^{2} + \lambda \left\| \boldsymbol{\beta} \right\|_{1}
+</script>
+</div>
+<p>The coefficient of <span><span class="MathJax_Preview">l_{1}</span><script type="math/tex">l_{1}</script></span>-regularization, <span><span class="MathJax_Preview">\lambda</span><script type="math/tex">\lambda</script></span>, is determined via binary search so that the resulting solution <span><span class="MathJax_Preview">\boldsymbol{\beta}^{*}</span><script type="math/tex">\boldsymbol{\beta}^{*}</script></span> has exactly <span><span class="MathJax_Preview">c_{i}</span><script type="math/tex">c_{i}</script></span> non-zero entries. We solve the above unconstrained problem with the Iterative Shrinkage Thresholding Algorithm (ISTA).</p>
+<h2 id="hyper-parameters">Hyper-parameters</h2>
+<p>Below is the full list of hyper-parameters used in <code>ChannelPrunedRmtLearner</code>:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>cpr_save_path</code></td>
+<td align="left">model's save path</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_save_path_eval</code></td>
+<td align="left">model's save path for evaluation</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_save_path_ws</code></td>
+<td align="left">model's save path for warm-start</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_prune_ratio</code></td>
+<td align="left">target pruning ratio</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_skip_frst_layer</code></td>
+<td align="left">skip the first convolutional layer for channel pruning</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_skip_last_layer</code></td>
+<td align="left">skip the last convolutional layer for channel pruning</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_skip_op_names</code></td>
+<td align="left">comma-separated Conv2D operations names to be skipped</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_nb_smpls</code></td>
+<td align="left">number of cached training samples for channel pruning</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_nb_crops_per_smpl</code></td>
+<td align="left">number of random crops per sample</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_ista_lrn_rate</code></td>
+<td align="left">ISTA's learning rate</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_ista_nb_iters</code></td>
+<td align="left">number of iterations in ISTA</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_lstsq_lrn_rate</code></td>
+<td align="left">least-square regression's learning rate</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_lstsq_nb_iters</code></td>
+<td align="left">number of iterations in least-square regression</td>
+</tr>
+<tr>
+<td align="left"><code>cpr_warm_start</code></td>
+<td align="left">use a channel-pruned model for warm start</td>
+</tr>
+</tbody>
+</table>
+<p>Here, we provide detailed description (and some analysis) for above hyper-parameters:</p>
+<ul>
+<li><code>cpr_save_path</code>: save path for model created in the training graph. The resulting checkpoint files can be used to resume training from a previous run and compute model's loss function's value and some other evaluation metrics.</li>
+<li><code>cpr_save_path_eval</code>: save path for model created in the evaluation graph. The resulting checkpoint files can be used to export GraphDef &amp; TensorFlow Lite model files.</li>
+<li><code>cpr_save_path_ws</code>: save path for model used for warm-start. This learner supports loading a previously-saved channel-pruned model, so that no need to perform channel selection again. This is only used when <code>cpr_warm_start</code> is <code>True</code>.</li>
+<li><code>cpr_prune_ratio</code>: target pruning ratio for input channels of each convolutional layer. The larger <code>cpr_prune_ratio</code> is, the more input channels will be pruned. If <code>cpr_prune_ratio</code> equals 0, then no input channels will be pruned and model remains the same; if <code>cpr_prune_ratio</code> equals 1, then all input channels will be pruned.</li>
+<li><code>cpr_skip_frst_layer</code>: whether to skip the first convolutional layer for channel pruning. The first convolutional layer may be directly related to input images and pruning its input channel may harm the performance significantly.</li>
+<li><code>cpr_skip_last_layer</code>: whether to skip the last convolutional layer for channel pruning. The first convolutional layer may be directly related to final outputs and pruning its input channel may harm the performance significantly.</li>
+<li><code>cpr_skip_op_names</code>: comma-separated Conv2D operations names to be skipped. For instance, if <code>cpr_skip_op_names</code> is set to "aaa,bbb", then any Conv2D operation whose name contains either "aaa" or "bbb" will be skipped and no channel pruning will be applied on it.</li>
+<li><code>cpr_nb_smpls</code>: number of cached training samples for channel pruning. Increasing this may lead to smaller performance degradation after channel pruning but also require more training time.</li>
+<li><code>cpr_nb_crops_per_smpl</code>: number of random crops per sample. Increasing this may lead to smaller performance degradation after channel pruning but also require more training time.</li>
+<li><code>cpr_ista_lrn_rate</code>: ISTA's learning rate for LASSO regression. If <code>cpr_ista_lrn_rate</code> is too large, then the optimization process may become unstable; if <code>cpr_ista_lrn_rate</code> is too small, then the optimization process may require lots of iterations until convergence.</li>
+<li><code>cpr_ista_nb_iters</code>: number of iterations for LASSO regression.</li>
+<li><code>cpr_lstsq_lrn_rate</code>: Adam's learning rate for least-square regression. If <code>cpr_lstsq_lrn_rate</code> is too large, then the optimization process may become unstable; if <code>cpr_lstsq_lrn_rate</code> is too small, then the optimization process may require lots of iterations until convergence.</li>
+<li><code>cpr_lstsq_nb_iters</code>: number of iterations for least-square regression.</li>
+<li><code>cpr_warm_start</code>: whether to use a previously-saved channel-pruned model for warm-start.</li>
+</ul>
+<h2 id="empirical-evaluation">Empirical Evaluation</h2>
+<p>In this section, we present some of our results for applying <code>ChannelPrunedRmtLearner</code> for compression image classification and object detection models.</p>
+<p>For image classification, we use <code>ChannelPrunedRmtLearner</code> to compress the ResNet-18 model on the ILSVRC-12 dataset:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Model</th>
+<th align="center">Prune Ratio</th>
+<th align="center">FLOPs</th>
+<th align="center">Distillation?</th>
+<th align="center">Top-1 Acc.</th>
+<th align="center">Top-5 Acc.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.2</td>
+<td align="center">73.32%</td>
+<td align="center">No</td>
+<td align="center">69.43%</td>
+<td align="center">88.97%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.2</td>
+<td align="center">73.32%</td>
+<td align="center">Yes</td>
+<td align="center">68.78%</td>
+<td align="center">88.71%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.3</td>
+<td align="center">61.31%</td>
+<td align="center">No</td>
+<td align="center">68.44%</td>
+<td align="center">88.30%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.3</td>
+<td align="center">61.31%</td>
+<td align="center">Yes</td>
+<td align="center">68.85%</td>
+<td align="center">88.53%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.4</td>
+<td align="center">50.70%</td>
+<td align="center">No</td>
+<td align="center">67.17%</td>
+<td align="center">87.48%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.4</td>
+<td align="center">50.70%</td>
+<td align="center">Yes</td>
+<td align="center">67.35%</td>
+<td align="center">87.83%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.5</td>
+<td align="center">41.27%</td>
+<td align="center">No</td>
+<td align="center">65.73%</td>
+<td align="center">86.38%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.5</td>
+<td align="center">41.27%</td>
+<td align="center">Yes</td>
+<td align="center">65.98%</td>
+<td align="center">86.98%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.6</td>
+<td align="center">32.07%</td>
+<td align="center">No</td>
+<td align="center">63.38%</td>
+<td align="center">84.62%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.6</td>
+<td align="center">32.07%</td>
+<td align="center">Yes</td>
+<td align="center">63.65%</td>
+<td align="center">85.47%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.7</td>
+<td align="center">24.28%</td>
+<td align="center">No</td>
+<td align="center">60.26%</td>
+<td align="center">82.70%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.7</td>
+<td align="center">24.28%</td>
+<td align="center">Yes</td>
+<td align="center">60.43%</td>
+<td align="center">82.96%</td>
+</tr>
+</tbody>
+</table>
+<p>For object detection, we use <code>ChannelPrunedRmtLearner</code> to compress the SSD-VGG16 model on the Pascal VOC 07-12 dataset:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Model</th>
+<th align="center">Prune Ratio</th>
+<th align="center">FLOPs</th>
+<th align="center">Pruned Layers</th>
+<th align="center">mAP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.2</td>
+<td align="center">67.34%</td>
+<td align="center">Backbone</td>
+<td align="center">77.53%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.2</td>
+<td align="center">66.50%</td>
+<td align="center">All</td>
+<td align="center">77.22%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.3</td>
+<td align="center">53.58%</td>
+<td align="center">Backbone</td>
+<td align="center">76.94%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.3</td>
+<td align="center">52.32%</td>
+<td align="center">All</td>
+<td align="center">76.90%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.4</td>
+<td align="center">41.63%</td>
+<td align="center">Backbone</td>
+<td align="center">75.81%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.4</td>
+<td align="center">39.96%</td>
+<td align="center">All</td>
+<td align="center">75.80%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.5</td>
+<td align="center">31.56%</td>
+<td align="center">Backbone</td>
+<td align="center">74.42%</td>
+</tr>
+<tr>
+<td align="center">ResNet-18</td>
+<td align="center">0.5</td>
+<td align="center">29.47%</td>
+<td align="center">All</td>
+<td align="center">73.76%</td>
+</tr>
+</tbody>
+</table>
+<h2 id="usage-examples">Usage Examples</h2>
+<p>In this section, we provide some usage examples to demonstrate how to use <code>ChannelPrunedRmtLearner</code> under different execution modes and hyper-parameter combinations:</p>
+<p>To compress a ResNet-20 model for CIFAR-10 classification task in the local mode, use:</p>
+<pre><code class="bash"># set the target pruning ratio to 0.50
+./scripts/run_local.sh nets/resnet_at_cifar10_run.py \
+    --learner=chn-pruned-rmt \
+    --cpr_prune_ratio=0.50
+</code></pre>
+
+<p>To compress a ResNet-18 model for ILSVRC-12 classification task in the docker mode with 4 GPUs, use:</p>
+<pre><code class="bash"># do no apply channel pruning to the last convolutional layer
+./scripts/run_docker.sh nets/resnet_at_ilsvrc12_run.py -n=4 \
+    --learner=chn-pruned-rmt \
+    --cpr_skip_last_layer=True
+</code></pre>
+
+<p>To compress a MobileNet-v1 model for ILSVRC-12 classification task in the seven mode with 8 GPUs, use:</p>
+<pre><code class="bash"># use a channel-pruned model for warm-start, so no channel selection is needed
+./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py -n=8 \
+    --learner=chn-pruned-rmt \
+    --cpr_warm_start=True \
+    --cpr_save_path_ws=./models_cpr_ws/model.ckpt
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../dcp_learner/" class="btn btn-neutral float-right" title="Discrimination-aware Channel Pruning">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../cp_learner/" class="btn btn-neutral" title="Channel Pruning"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../cp_learner/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../dcp_learner/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../mathjax-config.js" defer></script>
+      <script src="../MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

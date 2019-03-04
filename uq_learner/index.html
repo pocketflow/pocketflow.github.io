@@ -73,6 +73,10 @@
                 </li>
                 <li class="">
                     
+    <a class="" href="../cpr_learner/">Channel Pruning - Remastered</a>
+                </li>
+                <li class="">
+                    
     <a class="" href="../dcp_learner/">Discrimination-aware Channel Pruning</a>
                 </li>
                 <li class="">
@@ -364,7 +368,7 @@ Q \left( x \right) = \alpha \cdot \hat{x} + \beta.
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>uql_evquivalent_bits</code></td>
+<td align="left"><code>uql_equivalent_bits</code></td>
 <td align="left">the number of re-allocated bits that is equivalent to uniform allocation of bits. Default: <code>4</code>.</td>
 </tr>
 <tr>
@@ -445,7 +449,7 @@ sh ./scripts/run_docker.sh nets/resnet_at_ilsvrc12_run.py \
 
 <p>To quantize a MobileNet-v1 model for ILSVRC_12 classification task with 4 bits in the seven mode with 8 GPUs, and allow the RL agent to search for the optimal bit strategy, use:</p>
 <pre><code class="bash"># quantize mobilenet-v1 on ILSVRC-12
-sh ./scripts/run_seven.sh nets/mobilnet_at_ilsvrc12_run.py \
+sh ./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py \
 -n=8 \
 --learner=uniform \
 --uql_enbl_rl_agent=True \
@@ -453,7 +457,7 @@ sh ./scripts/run_seven.sh nets/mobilnet_at_ilsvrc12_run.py \
 </code></pre>
 
 <h2 id="uniformquanttflearner">UniformQuantTFLearner</h2>
-<p>PocketFlow also wraps the quantization aware training in TensorFlow. The quantized model can be directly exported to <code>.tflite</code> format via <a href="https://github.com/haolibai/PocketFlow/blob/master/tools/conversion/export_quant_tflite_model.py">export_quant_tflite_model.py</a> in PocketFlow, and then be easily deployed on Andriod devices.</p>
+<p>PocketFlow also wraps the quantization aware training in TensorFlow. The quantized model can be directly exported to <code>.tflite</code> format via <a href="https://github.com/haolibai/PocketFlow/blob/master/tools/conversion/export_quant_tflite_model.py">export_quant_tflite_model.py</a> in PocketFlow, and then be easily deployed on Android devices.</p>
 <p>To configure <code>UniformQuantTFLearner</code>, the hyper-parameters are as follows:</p>
 <table>
 <thead>
@@ -500,11 +504,11 @@ sh ./scripts/run_seven.sh nets/mobilnet_at_ilsvrc12_run.py \
 <li><code>uqtf_lrn_rate_dcy</code> : The decay of learning rate for the quantized model. Generally the quantized network needs smaller learning rate comparing to that for the full-precision model.</li>
 </ul>
 <h3 id="usage-examples_1">Usage Examples</h3>
-<p>To deploy a quantized network on Andriod devices, there are generally 3 steps:</p>
+<p>To deploy a quantized network on Android devices, there are generally 3 steps:</p>
 <h3 id="quantize-the-pre-trained-network">Quantize the pre-trained network</h3>
 <p>To quantize a MobileNet-v1 model for ILSVRC-12 classification task with 8 bits in the seven mode, use:</p>
 <pre><code class="bash"># quantize MobileNet-v1 on ILSVRC-12
-$ ./scripts/run_seven.sh nets/mobilnet_at_ilsvrc12_run.py -n=8 \
+$ ./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py -n=8 \
     --learner uniform-tf \
     --nb_epochs_rat 0.2
 </code></pre>

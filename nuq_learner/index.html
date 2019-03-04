@@ -73,6 +73,10 @@
                 </li>
                 <li class="">
                     
+    <a class="" href="../cpr_learner/">Channel Pruning - Remastered</a>
+                </li>
+                <li class="">
+                    
     <a class="" href="../dcp_learner/">Discrimination-aware Channel Pruning</a>
                 </li>
                 <li class="">
@@ -265,11 +269,11 @@ The following figure taken from <a href="https://arxiv.org/abs/1510.00149">Han e
 </tr>
 <tr>
 <td align="left"><code>nuql_bucket_size</code></td>
-<td align="left">the number of bucket size for bucket type 'split'. Default: `256.</td>
+<td align="left">the number of bucket size for bucket type 'split'. Default: <code>256</code>.</td>
 </tr>
 <tr>
 <td align="left"><code>nuql_enbl_rl_agent</code></td>
-<td align="left">the switch to enable RL to learn optimal bit strategy. Default:<code>False</code>.</td>
+<td align="left">the switch to enable RL to learn optimal bit strategy. Default: <code>False</code>.</td>
 </tr>
 <tr>
 <td align="left"><code>nuql_quantize_all_layers</code></td>
@@ -306,7 +310,7 @@ The following figure taken from <a href="https://arxiv.org/abs/1510.00149">Han e
 </thead>
 <tbody>
 <tr>
-<td align="left"><code>nuql_evquivalent_bits</code></td>
+<td align="left"><code>nuql_equivalent_bits</code></td>
 <td align="left">the number of re-allocated bits that is equivalent to non-uniform quantization without RL agent. Default: <code>4</code>.</td>
 </tr>
 <tr>
@@ -371,7 +375,7 @@ sh ./scripts/run_docker.sh nets/resnet_at_ilsvrc12_run.py \
 
 <p>To quantize a MobileNet-v1 model for ILSVRC_12 classification task with 4 bits in the seven mode with 8 GPUs, and allow the RL agent to search for the optimal bit strategy, use:</p>
 <pre><code class="bash"># quantize mobilenet-v1 on ILSVRC-12
-sh ./scripts/run_seven.sh nets/mobilnet_at_ilsvrc12_run.py \
+sh ./scripts/run_seven.sh nets/mobilenet_at_ilsvrc12_run.py \
 -n=8 \
 --learner=non-uniform \
 --nuql_enbl_rl_agent=True \

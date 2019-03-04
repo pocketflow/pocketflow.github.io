@@ -73,6 +73,10 @@
                 </li>
                 <li class="">
                     
+    <a class="" href="../cpr_learner/">Channel Pruning - Remastered</a>
+                </li>
+                <li class="">
+                    
     <a class="" href="../dcp_learner/">Discrimination-aware Channel Pruning</a>
                 </li>
                 <li class="">
@@ -214,7 +218,7 @@ Our implementation is compatible with:</p>
 </ul>
 <p>We have provide a wrapper class, <code>MultiGpuWrapper</code>, to seamlessly switch between the above two frameworks.
 It will sequentially check whether Horovod and TF-Plus can be used, and use the first available one as the underlying framework for multi-GPU training.</p>
-<p>The main reason that using Horovod or TF-Plus instead TensorFlow's original distributed training routine is that these framewors provide many easy-to-use APIs and require far less code changes to change from single-GPU to multi-GPU training, as we shall see later.</p>
+<p>The main reason that using Horovod or TF-Plus instead TensorFlow's original distributed training routine is that these frameworks provide many easy-to-use APIs and require far less code changes to change from single-GPU to multi-GPU training, as we shall see later.</p>
 <h2 id="from-single-gpu-to-multi-gpu">From Single-GPU to Multi-GPU</h2>
 <p>To extend a single-GPU based training script to the multi-GPU scenario, at most 7 steps are needed:</p>
 <ul>
