@@ -242,6 +242,7 @@ After obtaining the optimal pruning ratios, group fine-tuning is adopted to furt
 </tr>
 </tbody>
 </table>
+<p><strong>Note:</strong> The original uncompressed MobileNet-v1's top-1 accuracy is 70.89%.</p>
 <p>We adopt <code>WeightSparseLearner</code> to introduce the sparsity constraint so that a large portion of model weights can be removed, which leads to smaller model and lower FLOPs for inference.
 Comparing with the original algorithm proposed in (Zhu &amp; Gupta, 2017), we also incorporate network distillation and reinforcement learning algorithms to further improve the compressed model's accuracy, as shown in the table below:</p>
 <table>
@@ -280,6 +281,7 @@ Comparing with the original algorithm proposed in (Zhu &amp; Gupta, 2017), we al
 </tr>
 </tbody>
 </table>
+<p><strong>Note:</strong> The original uncompressed MobileNet-v1's top-1 accuracy is 70.89%.</p>
 <p>We adopt <code>UniformQuantTFLearner</code> to uniformly quantize model weights from 32-bit floating-point numbers to 8-bit fixed-point numbers.
 The resulting model can be converted into the TensorFlow Lite format for deployment on mobile devices.
 In the following two tables, we show that 8-bit quantized models can be as accurate as (or even better than) the original 32-bit ones, and the inference time can be significantly reduced after quantization.</p>
